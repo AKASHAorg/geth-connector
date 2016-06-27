@@ -19,6 +19,9 @@ export class Web3 {
         this.web3Instance.admin = Promise.promisifyAll(this.web3Instance.admin);
     }
 
+    /**
+     * @returns {Web3Factory}
+     */
     get web3() {
         return this.web3Instance;
     }
@@ -27,7 +30,7 @@ export class Web3 {
      *
      * @param gethIpc
      * @param socket
-     * @returns {Bluebird}
+     * @returns {any}
      */
     setProvider(gethIpc: string, socket: Socket) {
         if (this.web3Instance.currentProvider) {
@@ -37,6 +40,11 @@ export class Web3 {
         return this.web3Instance.admin.nodeInfoAsync();
     }
 
+    /**
+     *
+     * @returns {{properties: ts.SymbolFlags[]}}
+     * @private
+     */
     _adminProps() {
         return {
             properties: [

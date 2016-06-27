@@ -37,6 +37,14 @@ export class GethBin {
     }
 
     /**
+     * Required geth version for this app
+     * @returns {string}
+     */
+    static requiredVersion() {
+        return gethVersion;
+    }
+
+    /**
      * Check if binary is ok
      * @returns {Bluebird}
      */
