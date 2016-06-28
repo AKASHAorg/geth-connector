@@ -2,24 +2,22 @@ import {GethBin} from './GethBin';
 import {Web3} from './Web3';
 import {Socket} from 'net';
 import * as event from './Constants';
-import { EventEmitter } from 'events';
+import {EventEmitter} from 'events';
+import {spawn, ChildProcess} from 'child_process';
+import * as Promise from 'bluebird';
+import {type as osType, homedir} from 'os';
+import {join as pathJoin} from 'path';
 
-import childProcess = require('child_process');
-import Promise = require('bluebird');
-import net = require('net');
-import os = require('os');
-import path = require('path');
-
-const platform = os.type();
+const platform = osType();
 const symbolEnforcer = Symbol();
 const symbol = Symbol();
 
 export class GethConnector extends EventEmitter {
-    public downloadManager: GethBin;
+    public downloadManager = new GethBin();
     public ipcStream = new Web3();
     public logger: any = console;
     public spawnOptions = new Map();
-    public gethService: childProcess.ChildProcess;
+    public gethService: ChildProcess;
     private socket: Socket = new Socket();
 
     /**
@@ -59,18 +57,38 @@ export class GethConnector extends EventEmitter {
     }
 
     /**
-     * 
+     * @fires GethConnector#STARTING
      * @param options
      */
     public start(options?: Object) {
+        /**
+         * @event GethConnector#STARTING
+         */
         this.emit(event.STARTING);
+        this.setOptions(options);
+        return this._checkBin().then((binPath: string) => {
+            if (!binPath) {
+                /**
+                 * @event GethConnector#FAILED
+                 */
+                this.emit(event.FAILED, ['gethBin']);
+                return false;
+            }
+            this.gethService = spawn(binPath, this._flattenOptions(), {detached: true});
+            return true;
+        }).then(() => {
+            this._attachEvents();
+        });
     }
 
     /**
-     *
+     * @fires GethConnector#STOPPING
      * @returns {Bluebird<Web3>}
      */
     public stop() {
+        /**
+         * @event GethConnector#STOPPING
+         */
         this.emit(event.STOPPING);
         return Promise.resolve(this.ipcStream);
     }
@@ -82,12 +100,18 @@ export class GethConnector extends EventEmitter {
      * @returns {Map<any, any>}
      */
     public setOptions(options?: Object) {
-        const localOptions = Object.assign({}, event.START_OPTIONS, options);
+        const localOptions = Object.assign(
+            {
+                datadir: GethConnector.getDefaultDatadir(),
+                ipcpath: GethConnector.getDefaultIpcPath()
+            }, event.START_OPTIONS, options);
+
         for (let option in localOptions) {
             if (localOptions.hasOwnProperty(option)) {
-                this.spawnOptions.set(localOptions, localOptions[option]);
+                this.spawnOptions.set(option, localOptions[option]);
             }
         }
+        console.log(this.spawnOptions);
         return this.spawnOptions;
     }
 
@@ -111,13 +135,13 @@ export class GethConnector extends EventEmitter {
         let dataDir: String;
         switch (platform) {
             case 'Linux':
-                dataDir = path.join(os.homedir(), '.ethereum');
+                dataDir = pathJoin(homedir(), '.ethereum');
                 break;
             case 'Darwin':
-                dataDir = path.join(os.homedir(), 'Library', 'Ethereum');
+                dataDir = pathJoin(homedir(), 'Library', 'Ethereum');
                 break;
             case 'Windows_NT':
-                dataDir = path.join(process.env.APPDATA, '/Ethereum');
+                dataDir = pathJoin(process.env.APPDATA, '/Ethereum');
                 break;
             default:
                 throw new Error('Platform not supported');
@@ -137,7 +161,7 @@ export class GethConnector extends EventEmitter {
                 ipcPath = '\\\\.\\pipe\\geth.ipc';
                 break;
             default:
-                ipcPath = path.join(dataDirPath, 'geth.ipc');
+                ipcPath = pathJoin(dataDirPath, 'geth.ipc');
                 break;
         }
         return ipcPath;
@@ -149,5 +173,122 @@ export class GethConnector extends EventEmitter {
      */
     get web3() {
         return this.ipcStream.web3;
+    }
+
+    /**
+     * @fires GethConnector#DOWNLOADING_BINARY
+     * @fires GethConnector#BINARY_CORRUPTED
+     * @returns {Bluebird<U>}
+     * @private
+     */
+    private _checkBin() {
+        const timeOut = setTimeout(() => {
+            /**
+             * @event GethConnector#DOWNLOADING_BINARY
+             */
+            this.emit(event.DOWNLOADING_BINARY);
+        }, 500);
+        return this.downloadManager.check().then((binPath) => {
+            clearTimeout(timeOut);
+            return binPath;
+        }).catch(err => {
+            /**
+             * @event GethConnector#BINARY_CORRUPTED
+             */
+            this.emit(event.BINARY_CORRUPTED, err);
+            this.logger.error(err);
+            return '';
+        });
+    }
+
+    private _checkVersion() {
+
+    }
+
+    /**
+     * Transform `spawnOptions` mapping to array
+     * @returns {any[]}
+     * @private
+     */
+    private _flattenOptions() {
+        const arrayOptions: any[] = [];
+        for (let [key, value] of this.spawnOptions) {
+            arrayOptions.push(`--${key}`);
+            if (value) {
+                arrayOptions.push(value);
+            }
+        }
+        return arrayOptions;
+    }
+
+    private _attachEvents() {
+        this.__listenProcess();
+        this._watchGethStd();
+    }
+
+    /**
+     * @fires GethConnector#STOPPED
+     * @fires GethConnector#FAILED
+     * @private
+     */
+    private __listenProcess() {
+        this.gethService.on('exit', (code: number, signal: string) => {
+            if (code) {
+                this.logger.error(`geth: exited with code: ${code}`);
+            } else {
+                this.logger.info(`geth: received signal: ${signal}`);
+            }
+        });
+
+        this.gethService.on('close', (code: number, signal: string) => {
+            this.logger.info('geth:spawn:close:', code, signal);
+            /**
+             * @event GethConnector#STOPPED
+             */
+            this.emit(event.STOPPED);
+        });
+
+        this.gethService.on('error', (code: string) => {
+            this.logger.error(`geth:spawn:error: ${code}`);
+            /**
+             * @event GethConnector#FAILED
+             */
+            this.emit(event.FAILED, ['gethService']);
+        });
+    }
+
+    public _tailGethLog() {
+        this.gethService.stdout.on('data', (data: Buffer) => {
+            this.logger.info(data.toString());
+        });
+        this.gethService.stderr.on('data', (data: Buffer) => {
+            this.logger.info(data.toString());
+        });
+    }
+
+    /**
+     * @fires GethConnector#FATAL
+     * @fires GethConnector#STARTED
+     * @private
+     */
+    private _watchGethStd() {
+        this.gethService.stderr.on('data', (data: Buffer) => {
+            if (data.toString().includes('clock seems off')) {
+                this.emit(event.TIME_NOT_SYNCED, [data.toString()]);
+            }
+            if (data.toString().includes('Fatal')) {
+                /**
+                 * @event GethConnector#FATAL
+                 */
+                this.emit(event.FATAL, [data.toString()]);
+            }
+            if (data.toString().includes('IPC endpoint opened')) {
+                /**
+                 * @event GethConnector#STARTED
+                 */
+                this.emit(event.STARTED);
+            }
+            this.logger.info(data.toString());
+        });
     }
 }

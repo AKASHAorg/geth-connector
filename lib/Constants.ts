@@ -7,7 +7,7 @@ export const STOPPING = 'GETH_STOPPING';
 export const STOPPED = 'GETH_STOPPED';
 export const ERROR = 'GETH_ERROR';
 export const TIME_NOT_SYNCED = 'GETH_TIME_NOT_SYNCED';
-
+export const FATAL = 'GETH_CRASHED';
 
 export const START_OPTIONS = {cache: 512, shh: '', fast: '', testnet: ''};
 export const ETH_NETWORK_ID = '2'; // MORDEN

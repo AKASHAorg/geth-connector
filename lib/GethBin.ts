@@ -7,7 +7,7 @@ import url = require('url');
 const defaultTarget = path.join(__dirname, 'bin');
 
 const repo = 'https://github.com/ethereum/go-ethereum/releases/download/';
-const gethVersion = 'v1.4.7';
+const gethVersion = 'v1.4.7/';
 
 const baseUrl = url.resolve(repo, gethVersion);
 
@@ -20,6 +20,8 @@ const source = {
 const getDownloadUrl = (archive: string): string => {
     return url.resolve(baseUrl, archive);
 };
+
+console.log(getDownloadUrl(source.linux));
 
 export class GethBin {
     public wrapper: Wrapper;
@@ -45,6 +47,14 @@ export class GethBin {
     }
 
     /**
+     * Get exec path for geth
+     * @returns {string}
+     */
+    getPath() {
+        return this.wrapper.path();
+    }
+
+    /**
      * Check if binary is ok
      * @returns {Bluebird}
      */
@@ -54,7 +64,7 @@ export class GethBin {
                 if (err) {
                     return reject(err);
                 }
-                return resolve('geth-bin: executable is ok');
+                return resolve(this.getPath());
             });
         });
     }
