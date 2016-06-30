@@ -1,3 +1,5 @@
 "use strict";
 const GethConnector_1 = require('./lib/GethConnector');
-GethConnector_1.GethConnector.getInstance().start();
+exports.GethConnector = GethConnector_1.default;
+const GethHelper_1 = require('./lib/GethHelper');
+exports.gethHelper = GethHelper_1.default;

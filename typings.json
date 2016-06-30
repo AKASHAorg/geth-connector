@@ -1,10 +1,12 @@
 {
   "dependencies": {
     "bluebird": "registry:npm/bluebird#3.3.4+20160622205516",
+    "chai": "registry:npm/chai#3.5.0+20160415060238",
     "debug": "registry:npm/debug#2.0.0+20160511151334",
     "ramda": "registry:npm/ramda#0.21.0+20160531162943"
   },
   "globalDependencies": {
+    "mocha": "registry:env/mocha#2.2.5+20160321223601",
     "node": "registry:env/node#6.0.0+20160622202520"
   }
 }

@@ -6,6 +6,7 @@ declare class Web3 {
     public shh: any;
     public net: any;
     public personal: any;
+    public version: any;
     public settings: any;
     public providers: any;
     constructor(provider?: any);

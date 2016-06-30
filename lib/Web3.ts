@@ -11,6 +11,7 @@ export class Web3 {
         this.web3Instance.shh = Promise.promisifyAll(this.web3Instance.shh);
         this.web3Instance.personal = Promise.promisifyAll(this.web3Instance.personal);
         this.web3Instance.net = Promise.promisifyAll(this.web3Instance.net);
+        this.web3Instance.version = Promise.promisifyAll(this.web3Instance.version);
         this.web3Instance._extend({
             property: 'admin',
             properties: this._adminProps().properties
@@ -27,17 +28,17 @@ export class Web3 {
     }
 
     /**
-     *
+     * 
      * @param gethIpc
      * @param socket
-     * @returns {any}
+     * @returns {boolean}
      */
     setProvider(gethIpc: string, socket: Socket) {
         if (this.web3Instance.currentProvider) {
             this.web3Instance.reset();
         }
         this.web3Instance.setProvider(new this.web3Instance.providers.IpcProvider(gethIpc, socket));
-        return this.web3Instance.admin.nodeInfoAsync();
+        return this.web3Instance.currentProvider.isConnected();
     }
 
     /**

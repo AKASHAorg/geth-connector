@@ -12,12 +12,13 @@ const platform = osType();
 const symbolEnforcer = Symbol();
 const symbol = Symbol();
 
-export class GethConnector extends EventEmitter {
+export default class GethConnector extends EventEmitter {
     public downloadManager = new GethBin();
     public ipcStream = new Web3();
     public logger: any = console;
     public spawnOptions = new Map();
     public gethService: ChildProcess;
+    public serviceStatus: { process: boolean, api: boolean } = {process: false, api: false};
     private socket: Socket = new Socket();
 
     /**
@@ -72,25 +73,43 @@ export class GethConnector extends EventEmitter {
                  * @event GethConnector#FAILED
                  */
                 this.emit(event.FAILED, ['gethBin']);
+                this.serviceStatus.process = false;
                 return false;
             }
             this.gethService = spawn(binPath, this._flattenOptions(), {detached: true});
             return true;
-        }).then(() => {
-            this._attachEvents();
+        }).then((passed: boolean) => {
+            if (passed) {
+                this._attachEvents();
+            }
+            return passed;
         });
     }
 
     /**
      * @fires GethConnector#STOPPING
-     * @returns {Bluebird<Web3>}
+     * @fires GethConnector#STOPPED
+     * @param signal
+     * @returns {Bluebird<U>}
      */
-    public stop() {
+    public stop(signal?: string) {
         /**
          * @event GethConnector#STOPPING
          */
         this.emit(event.STOPPING);
-        return Promise.resolve(this.ipcStream);
+        this.web3.reset();
+        this.socket.removeAllListeners();
+        this.gethService.stdout.removeAllListeners();
+        this.gethService.stderr.removeAllListeners();
+        this.gethService.removeAllListeners();
+        return Promise.resolve(this.gethService.kill(signal))
+            .then(() => {
+                /**
+                 * @event GethConnector#STOPPED
+                 */
+                this.emit(event.STOPPED);
+            });
+
     }
 
     /**
@@ -100,18 +119,29 @@ export class GethConnector extends EventEmitter {
      * @returns {Map<any, any>}
      */
     public setOptions(options?: Object) {
-        const localOptions = Object.assign(
-            {
-                datadir: GethConnector.getDefaultDatadir(),
-                ipcpath: GethConnector.getDefaultIpcPath()
-            }, event.START_OPTIONS, options);
+        let localOptions: Object;
+        if (this.spawnOptions.size) {
+            if (!options) {
+                return this.spawnOptions;
+            }
+            localOptions = options;
+        } else {
+            localOptions = Object.assign(
+                {
+                    datadir: GethConnector.getDefaultDatadir(),
+                    ipcpath: GethConnector.getDefaultIpcPath()
+                }, event.START_OPTIONS, options);
+        }
 
         for (let option in localOptions) {
             if (localOptions.hasOwnProperty(option)) {
                 this.spawnOptions.set(option, localOptions[option]);
             }
         }
-        console.log(this.spawnOptions);
+        if (this.spawnOptions.get(event.BIN_PATH)) {
+            this.setBinPath(this.spawnOptions.get(event.BIN_PATH));
+            this.spawnOptions.delete(event.BIN_PATH);
+        }
         return this.spawnOptions;
     }
 
@@ -120,7 +150,7 @@ export class GethConnector extends EventEmitter {
      * @param waitTime
      * @returns {Bluebird<U>}
      */
-    public restart(waitTime = 7000) {
+    public restart(waitTime = 5000) {
         return Promise
             .resolve(this.stop())
             .delay(waitTime)
@@ -201,10 +231,6 @@ export class GethConnector extends EventEmitter {
         });
     }
 
-    private _checkVersion() {
-
-    }
-
     /**
      * Transform `spawnOptions` mapping to array
      * @returns {any[]}
@@ -224,6 +250,7 @@ export class GethConnector extends EventEmitter {
     private _attachEvents() {
         this.__listenProcess();
         this._watchGethStd();
+        this._attachListeners();
     }
 
     /**
@@ -233,11 +260,16 @@ export class GethConnector extends EventEmitter {
      */
     private __listenProcess() {
         this.gethService.on('exit', (code: number, signal: string) => {
+            let message: string;
             if (code) {
-                this.logger.error(`geth: exited with code: ${code}`);
+                message = `geth: exited with code: ${code}`;
+                this.logger.error(message);
+                this.emit(event.ERROR, [message]);
             } else {
-                this.logger.info(`geth: received signal: ${signal}`);
+                message = `geth: received signal: ${signal}`;
+                this.logger.info(message);
             }
+            this.serviceStatus.process = false;
         });
 
         this.gethService.on('close', (code: number, signal: string) => {
@@ -250,6 +282,7 @@ export class GethConnector extends EventEmitter {
 
         this.gethService.on('error', (code: string) => {
             this.logger.error(`geth:spawn:error: ${code}`);
+            this.serviceStatus.process = false;
             /**
              * @event GethConnector#FAILED
              */
@@ -257,7 +290,11 @@ export class GethConnector extends EventEmitter {
         });
     }
 
-    public _tailGethLog() {
+    /**
+     * log geth std
+     * @private
+     */
+    private _tailGethLog() {
         this.gethService.stdout.on('data', (data: Buffer) => {
             this.logger.info(data.toString());
         });
@@ -269,11 +306,24 @@ export class GethConnector extends EventEmitter {
     /**
      * @fires GethConnector#FATAL
      * @fires GethConnector#STARTED
+     * @fires GethConnector#ERROR
+     * @fires GethConnector#TIME_NOT_SYNCED
      * @private
      */
     private _watchGethStd() {
+        this.serviceStatus.process = false;
+        const timeout = setTimeout(() => {
+            this.gethService.stderr.removeAllListeners('data');
+            /**
+             * @event GethConnector#ERROR
+             */
+            this.emit(event.ERROR, ['geth connection timeout']);
+        }, 20000);
         this.gethService.stderr.on('data', (data: Buffer) => {
             if (data.toString().includes('clock seems off')) {
+                /**
+                 * @event GethConnector#TIME_NOT_SYNCED
+                 */
                 this.emit(event.TIME_NOT_SYNCED, [data.toString()]);
             }
             if (data.toString().includes('Fatal')) {
@@ -281,14 +331,98 @@ export class GethConnector extends EventEmitter {
                  * @event GethConnector#FATAL
                  */
                 this.emit(event.FATAL, [data.toString()]);
+                clearTimeout(timeout);
             }
             if (data.toString().includes('IPC endpoint opened')) {
+                this.serviceStatus.process = true;
                 /**
                  * @event GethConnector#STARTED
                  */
                 this.emit(event.STARTED);
+                clearTimeout(timeout);
             }
             this.logger.info(data.toString());
+        });
+    }
+
+    /**
+     * @listens GethConnector#STARTED
+     * @private
+     */
+    private _attachListeners() {
+        this.on(event.STARTED, () => {
+            this.gethService.stderr.removeAllListeners('data');
+            this._tailGethLog();
+            this._connectToIPC();
+        });
+    }
+
+    /**
+     * @fires GethConnector#IPC_CONNECTED
+     * @fires GethConnector#IPC_DISCONNECTED
+     * @private
+     */
+    private _connectToIPC() {
+        this.ipcStream.setProvider(this.spawnOptions.get('ipcpath'), this.socket);
+        this.socket.on('connect', () => {
+            this.logger.info('connection to ipc Established!');
+            this._checkRunningSevice().then(
+                (status: boolean) => {
+                    if (status) {
+                        this.serviceStatus.api = true;
+                    }
+                }
+            );
+            /**
+             * @event GethConnector#IPC_CONNECTED
+             */
+            this.emit(event.IPC_CONNECTED);
+        });
+        this.socket.on('error', (error: any) => {
+            this.web3.reset();
+            this.logger.error(error.message);
+            this.serviceStatus.api = false;
+            /**
+             * @event GethConnector#IPC_DISCONNECTED
+             */
+            this.emit(event.IPC_DISCONNECTED);
+        });
+    }
+
+    /**
+     * @fires GethConnector#ERROR
+     * @fires GethConnector#FATAL
+     * @fires GethConnector#ETH_NODE_OK
+     * @returns {Bluebird<boolean>}
+     * @private
+     */
+    private _checkRunningSevice() {
+        const requiredVersion = GethBin.requiredVersion();
+
+        const runningServiceProps = [
+            this.web3.version.getNodeAsync(),
+            this.web3.version.getNetworkAsync()
+        ];
+
+        return Promise.all(runningServiceProps).then(([buildVersion, networkId]) => {
+            let message: string;
+            if (!buildVersion.includes(requiredVersion)) {
+                message = `required geth version: ${requiredVersion}, found: ${buildVersion}`;
+                this.logger.warn(message);
+                this.emit(event.ERROR, message);
+            }
+
+            if (networkId !== event.ETH_NETWORK_ID) {
+                message = `required ethereum network: ${event.ETH_NETWORK_ID}, found: ${networkId}`;
+                this.logger.error(message);
+                this.emit(event.FATAL, message);
+                return false;
+            }
+            /**
+             * @event GethConnector#ETH_NODE_OK
+             */
+            this.emit(event.ETH_NODE_OK);
+            return true;
         });
     }
 }

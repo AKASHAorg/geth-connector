@@ -43,7 +43,7 @@ export class GethBin {
      * @returns {string}
      */
     static requiredVersion() {
-        return gethVersion;
+        return gethVersion.slice(0, -1);
     }
 
     /**
