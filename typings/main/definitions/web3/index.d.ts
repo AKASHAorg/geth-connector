@@ -12,6 +12,7 @@ declare class Web3 {
     constructor(provider?: any);
     setProvider(provider: any): void;
     reset(keepSync?: boolean): void;
+    filter(data: any): any;
     toHex(data: any): string;
     toAscii(data: any): string;
     toUtf8(data: any): string;

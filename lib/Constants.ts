@@ -11,7 +11,8 @@ export const FATAL = 'GETH_CRASHED';
 export const IPC_CONNECTED = 'GETH_IPC_CONNECTED';
 export const IPC_DISCONNECTED = 'GETH_IPC_DISCONNECTED';
 export const ETH_NODE_OK = 'ETH_NODE_OK';
+export const TX_MINED = 'TX_MINED';
 
 export const START_OPTIONS = {cache: 512, shh: '', fast: '', testnet: ''};
 export const ETH_NETWORK_ID = '2'; // MORDEN
-export const BIN_PATH = 'BIN_PATH';
+export const BIN_PATH = 'binPath';

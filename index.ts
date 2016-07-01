@@ -1,4 +1,4 @@
-import GethConnector  from './lib/GethConnector';
+import GethConnector from './lib/GethConnector';
 import gethHelper from './lib/GethHelper';
 
-export { GethConnector, gethHelper };
+export {GethConnector, gethHelper};

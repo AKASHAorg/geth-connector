@@ -20,6 +20,7 @@ export default class GethConnector extends EventEmitter {
     public gethService: ChildProcess;
     public serviceStatus: { process: boolean, api: boolean } = {process: false, api: false};
     private socket: Socket = new Socket();
+    private connectedToLocal: boolean = false;
 
     /**
      * @param enforcer
@@ -76,6 +77,9 @@ export default class GethConnector extends EventEmitter {
                 this.serviceStatus.process = false;
                 return false;
             }
+            if (this.connectedToLocal) {
+                return false;
+            }
             this.gethService = spawn(binPath, this._flattenOptions(), {detached: true});
             return true;
         }).then((passed: boolean) => {
@@ -97,11 +101,7 @@ export default class GethConnector extends EventEmitter {
          * @event GethConnector#STOPPING
          */
         this.emit(event.STOPPING);
-        this.web3.reset();
-        this.socket.removeAllListeners();
-        this.gethService.stdout.removeAllListeners();
-        this.gethService.stderr.removeAllListeners();
-        this.gethService.removeAllListeners();
+        this._flushEvents();
         return Promise.resolve(this.gethService.kill(signal))
             .then(() => {
                 /**
@@ -110,6 +110,31 @@ export default class GethConnector extends EventEmitter {
                 this.emit(event.STOPPED);
             });
 
+    }
+
+    /**
+     * connect to existing geth ipc 
+     */
+    public connectToLocal() {
+        this._connectToIPC();
+        this.connectedToLocal = true;
+    }
+
+    /**
+     *
+     * @returns {EventEmitter}
+     * @private
+     */
+    private _flushEvents() {
+        this.web3.reset();
+        this.socket.removeAllListeners();
+        if (!this.connectedToLocal) {
+            this.gethService.stdout.removeAllListeners();
+            this.gethService.stderr.removeAllListeners();
+            this.gethService.removeAllListeners();
+        }
+        this.socket.end();
+        return this.removeAllListeners();
     }
 
     /**
@@ -364,7 +389,7 @@ export default class GethConnector extends EventEmitter {
      */
     private _connectToIPC() {
         this.ipcStream.setProvider(this.spawnOptions.get('ipcpath'), this.socket);
-        this.socket.on('connect', () => {
+        this.socket.once('connect', () => {
             this.logger.info('connection to ipc Established!');
             this._checkRunningSevice().then(
                 (status: boolean) => {
