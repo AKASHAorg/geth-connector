@@ -1,7 +1,7 @@
 {
   "name": "geth-connector",
   "version": "1.0.0",
-  "description": "",
+  "description": "package used by AKASHA to manage geth/web3",
   "main": "index.js",
   "scripts": {
     "test": "mocha tests/index.js",
@@ -17,7 +17,7 @@
     "url": "https://github.com/AkashaProject/geth-connector/issues"
   },
   "engines": {
-    "node": ">=6.2.2"
+    "node": ">=6.1.0"
   },
   "homepage": "https://github.com/AkashaProject/geth-connector#readme",
   "dependencies": {
@@ -28,6 +28,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^2.5.3",
+    "rimraf": "^2.5.3",
     "sinon": "^1.17.4",
     "tslint": "^3.11.0",
     "typescript": "^1.8.10",

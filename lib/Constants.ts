@@ -16,3 +16,5 @@ export const TX_MINED = 'TX_MINED';
 export const START_OPTIONS = {cache: 512, shh: '', fast: '', testnet: ''};
 export const ETH_NETWORK_ID = '2'; // MORDEN
 export const BIN_PATH = 'binPath';
+export const START_FILTER = 'START_FILTER';
+export const INFO_FILTER = 'INFO_FILTER';

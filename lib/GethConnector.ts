@@ -21,6 +21,7 @@ export default class GethConnector extends EventEmitter {
     public serviceStatus: { process: boolean, api: boolean } = {process: false, api: false};
     private socket: Socket = new Socket();
     private connectedToLocal: boolean = false;
+    public watchers = new Map();
 
     /**
      * @param enforcer
@@ -102,7 +103,8 @@ export default class GethConnector extends EventEmitter {
          */
         this.emit(event.STOPPING);
         this._flushEvents();
-        return Promise.resolve(this.gethService.kill(signal))
+        const killProcess = (this.gethService) ? this.gethService.kill(signal) : true;
+        return Promise.resolve(killProcess)
             .then(() => {
                 /**
                  * @event GethConnector#STOPPED
@@ -113,7 +115,18 @@ export default class GethConnector extends EventEmitter {
     }
 
     /**
-     * connect to existing geth ipc 
+     * Get path for go-ethereum chaindata folder
+     * @returns {any}
+     */
+    public getChainFolder() {
+        return this.web3.admin.getDatadir().then((datadir: string) => {
+            return pathJoin(datadir, 'chaindata');
+        });
+    }
+
+
+    /**
+     * connect to existing geth ipc
      */
     public connectToLocal() {
         this._connectToIPC();
@@ -121,20 +134,34 @@ export default class GethConnector extends EventEmitter {
     }
 
     /**
-     *
-     * @returns {EventEmitter}
+     * Remove web3 and logging listeners
      * @private
      */
     private _flushEvents() {
         this.web3.reset();
         this.socket.removeAllListeners();
         if (!this.connectedToLocal) {
-            this.gethService.stdout.removeAllListeners();
-            this.gethService.stderr.removeAllListeners();
-            this.gethService.removeAllListeners();
+            if (this.watchers.get(event.START_FILTER)) {
+                this.gethService
+                    .stderr
+                    .removeListener('data', this.watchers.get(event.START_FILTER));
+                this.watchers
+                    .delete(event.START_FILTER);
+            }
+            if (this.watchers.get(event.INFO_FILTER)) {
+                this.gethService
+                    .stdout
+                    .removeListener('data', this.watchers.get(event.INFO_FILTER));
+
+                this.gethService
+                    .stderr
+                    .removeListener('data', this.watchers.get(event.INFO_FILTER));
+
+                this.watchers
+                    .delete(event.INFO_FILTER);
+            }
         }
-        this.socket.end();
-        return this.removeAllListeners();
+        return this.socket.end();
     }
 
     /**
@@ -284,7 +311,7 @@ export default class GethConnector extends EventEmitter {
      * @private
      */
     private __listenProcess() {
-        this.gethService.on('exit', (code: number, signal: string) => {
+        this.gethService.once('exit', (code: number, signal: string) => {
             let message: string;
             if (code) {
                 message = `geth: exited with code: ${code}`;
@@ -297,7 +324,7 @@ export default class GethConnector extends EventEmitter {
             this.serviceStatus.process = false;
         });
 
-        this.gethService.on('close', (code: number, signal: string) => {
+        this.gethService.once('close', (code: number, signal: string) => {
             this.logger.info('geth:spawn:close:', code, signal);
             /**
              * @event GethConnector#STOPPED
@@ -305,7 +332,7 @@ export default class GethConnector extends EventEmitter {
             this.emit(event.STOPPED);
         });
 
-        this.gethService.on('error', (code: string) => {
+        this.gethService.once('error', (code: string) => {
             this.logger.error(`geth:spawn:error: ${code}`);
             this.serviceStatus.process = false;
             /**
@@ -320,12 +347,16 @@ export default class GethConnector extends EventEmitter {
      * @private
      */
     private _tailGethLog() {
-        this.gethService.stdout.on('data', (data: Buffer) => {
+        if (this.watchers.get(event.START_FILTER)) {
+            this.gethService.stderr.removeListener('data', this.watchers.get(event.START_FILTER));
+            this.watchers.delete(event.START_FILTER);
+        }
+        const infoFilter = (data: Buffer) => {
             this.logger.info(data.toString());
-        });
-        this.gethService.stderr.on('data', (data: Buffer) => {
-            this.logger.info(data.toString());
-        });
+        };
+        this.watchers.set(event.INFO_FILTER, infoFilter);
+        this.gethService.stdout.on('data', this.watchers.get(event.INFO_FILTER));
+        this.gethService.stderr.on('data', this.watchers.get(event.INFO_FILTER));
     }
 
     /**
@@ -344,14 +375,15 @@ export default class GethConnector extends EventEmitter {
              */
             this.emit(event.ERROR, ['geth connection timeout']);
         }, 20000);
-        this.gethService.stderr.on('data', (data: Buffer) => {
+        const startFilter = (data: Buffer) => {
             if (data.toString().includes('clock seems off')) {
                 /**
                  * @event GethConnector#TIME_NOT_SYNCED
                  */
                 this.emit(event.TIME_NOT_SYNCED, [data.toString()]);
             }
-            if (data.toString().includes('Fatal')) {
+            if (data.toString().includes('Fatal') ||
+                data.toString().includes('Synchronisation failed')) {
                 /**
                  * @event GethConnector#FATAL
                  */
@@ -367,7 +399,11 @@ export default class GethConnector extends EventEmitter {
                 clearTimeout(timeout);
             }
             this.logger.info(data.toString());
-        });
+        };
+        // save a reference for removeListener
+        this.watchers.set(event.START_FILTER, startFilter);
+        // start listening
+        this.gethService.stderr.on('data', this.watchers.get(event.START_FILTER));
     }
 
     /**
@@ -375,8 +411,7 @@ export default class GethConnector extends EventEmitter {
      * @private
      */
     private _attachListeners() {
-        this.on(event.STARTED, () => {
-            this.gethService.stderr.removeAllListeners('data');
+        this.once(event.STARTED, () => {
             this._tailGethLog();
             this._connectToIPC();
         });
@@ -403,7 +438,7 @@ export default class GethConnector extends EventEmitter {
              */
             this.emit(event.IPC_CONNECTED);
         });
-        this.socket.on('error', (error: any) => {
+        this.socket.once('error', (error: any) => {
             this.web3.reset();
             this.logger.error(error.message);
             this.serviceStatus.api = false;
