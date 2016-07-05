@@ -1,29 +1,36 @@
 {
-  "name": "geth-connector",
+  "name": "@akashaproject/geth-connector",
   "version": "1.0.0",
-  "description": "package used by AKASHA to manage geth/web3",
+  "description": "Package used by AKASHA to manage geth/web3",
   "main": "index.js",
   "scripts": {
     "test": "mocha tests/index.js",
     "docs": "typedoc index.ts --out docs"
   },
+  "keywords": [
+    "geth",
+    "ethereum",
+    "akasha",
+    "web3"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AkashaProject/geth-connector.git"
   },
-  "author": "Marius Darila",
+  "author": "Marius Darila <kenshy_ripper@yahoo.com>",
   "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/AkashaProject/geth-connector/issues"
   },
   "engines": {
-    "node": ">=6.1.0"
+    "node": ">=6.1.0",
+    "npm": ">=3.9.0"
   },
   "homepage": "https://github.com/AkashaProject/geth-connector#readme",
   "dependencies": {
-    "bin-wrapper": "^3.0.2",
-    "bluebird": "^3.4.1",
-    "web3": "^0.17.0-alpha"
+    "bin-wrapper": "3.0.2",
+    "bluebird": "3.4.1",
+    "web3": "0.17.0-alpha"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -33,5 +40,8 @@
     "tslint": "^3.11.0",
     "typescript": "^1.8.10",
     "typings": "^1.3.0"
+  },
+  "directories": {
+    "test": "tests"
   }
 }

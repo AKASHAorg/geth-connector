@@ -7,10 +7,10 @@ import {expect} from 'chai';
 
 const binPath = pathJoin(__dirname, 'testBin');
 const txQueue = [
-    '0x8ed40509ad7087b45190488fcee0a8ff96c9349a9c99d6c0cc7f419f05204ace',
-    '0x5f66db0283e5a155b10fa7744c776db395e3a2d5963b133b7968d5078045b51f',
-    '0x0c7b697e3dcd0bc1ceacdf004f1402e87ddb66eca7a0b559228c013699b71f47',
-    '0x64f95b53c085b3f860b74fedcf60758fe6d9ace45978571bb8d93ebbdbd7893f'
+    '0xc52ea505a81076f98f3f56b893de417c524f98fa3a8bc66c0ba0edf73e52dca7',
+    '0xde6bbfbe189c1d4baa7791e485e17a0c27a362391c8446741ff99a03302c74e6',
+    '0x07dd3144fdd597692c7521af83e95f4accb6bb21738da72806c5de1af33517de',
+    '0xc93da25b1c88a6b0484b81e54163958ff9a1a4a9b7064c8e2ac6f14b9eab4a87'
 ];
 describe('GethConnector', function () {
     this.timeout(120000);
@@ -90,7 +90,7 @@ describe('GethConnector', function () {
     it('should be able to append tx to queue', function () {
         expect(
             gethHelper
-                .addTxToWatch('0x0aabd7a4338df3d89a35df4653120451c59ebe415e0fd875a8f2e16d68c5a7c6', false)
+                .addTxToWatch('0x8e5dce4185f942d34da7449eea20010d9eead8159631ef8a6ef725c86050d12f', false)
         ).not.to.throw;
     });
 
@@ -98,17 +98,19 @@ describe('GethConnector', function () {
      * Must be synced for this to work
      * works only on testnet(tx hash sources)
      */
-    it('should get notified when tx is mined', function (done) {
+    it.skip('should get notified when tx is mined', function (done) {
         this.timeout(180000);
         let calledTimes = 0;
         const expectedTimes = gethHelper.txQueue.size;
-        GethConnector.getInstance().on(events.TX_MINED, function (tx: string) {
+        const cb =  (tx: string) => {
             calledTimes++;
             if (!gethHelper.watching) {
                 expect(calledTimes).to.equal(expectedTimes);
+                GethConnector.getInstance().removeAllListeners(events.TX_MINED);
                 done();
             }
-        });
+        };
+        GethConnector.getInstance().on(events.TX_MINED, cb);
         function insync() {
              gethHelper.inSync().then(
                 (data) => {
@@ -124,6 +126,41 @@ describe('GethConnector', function () {
         insync();
     });
 
+    it.skip('should autowatch new transaction', function (done){
+        const txHash = '0x3273b3cf0cc4fbc5a32ad635c693c960f2e1a5789077b29255f875afa8e0251b';
+        const cb =  (tx: string) => {
+            if (tx === txHash) {
+                GethConnector.getInstance().removeAllListeners(events.TX_MINED);
+                done();
+            }
+        };
+        GethConnector.getInstance().on(events.TX_MINED, cb);
+        gethHelper.addTxToWatch(txHash);
+    });
+
+    it.skip('should autowatch multiple transactions', function (done){
+        const txPool = [
+            '0x97215aeab84b8fc4d6398743ab4ba88c49b67cc4ee6c2e8adc139bd429dc371f',
+            '0xe76b6e7c5327fc03d33d84795dd697d3259ff4340d4a400b2865ee96c2fc9b31',
+            '0x6d8f06aff5e14694959c1fd9ab18775b07781d75b0fe0b65b5e5cf58a227b040',
+            '0x5a88ffee1023f6898138bf1790c2884257c63e573b375f7d1b195efd6d4f9de5',
+            '0x92c1abf1b0a8ac8a5a6d43255064ed95c17b2cbc898c46151656f9baaba23c63'
+        ];
+        gethHelper.stopTxWatch();
+        const cb = (tx: string) => {
+            const index = txPool.indexOf(tx);
+            txPool.splice(index, 1);
+            if (txPool.length === 0) {
+                GethConnector.getInstance().removeAllListeners(events.TX_MINED);
+                done();
+            }
+        };
+        GethConnector.getInstance().on(events.TX_MINED, cb);
+        txPool.forEach((tx) => {
+            gethHelper.addTxToWatch(tx);
+        });
+    });
+
     it('should #stop geth process', function (done) {
         const spy = sinon.spy();
         GethConnector.getInstance().on(events.STOPPING, spy);
@@ -133,6 +170,7 @@ describe('GethConnector', function () {
 
     after(function (done) {
         rimraf(binPath, function () {
+            GethConnector.getInstance().removeAllListeners(events.TX_MINED)
             done();
         });
     });
