@@ -1,5 +1,7 @@
 # geth-connector
 
+[![Build Status](https://travis-ci.org/AkashaProject/geth-connector.svg?branch=master)](https://travis-ci.org/AkashaProject/geth-connector)
+[![bitHound Overall Score](https://www.bithound.io/github/AkashaProject/geth-connector/badges/score.svg)](https://www.bithound.io/github/AkashaProject/geth-connector)
 ### Description
 This is a package created and used by [AKASHA](http://akasha.world/) to manage [geth](http://ethereum.github.io/go-ethereum/)/[web3.js](https://github.com/ethereum/web3.js).
 
