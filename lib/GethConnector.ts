@@ -74,7 +74,7 @@ export default class GethConnector extends EventEmitter {
                 /**
                  * @event GethConnector#FAILED
                  */
-                this.emit(event.FAILED, ['gethBin']);
+                this.emit(event.FAILED, 'gethBin');
                 this.serviceStatus.process = false;
                 return false;
             }
@@ -316,7 +316,7 @@ export default class GethConnector extends EventEmitter {
             if (code) {
                 message = `geth: exited with code: ${code}`;
                 this.logger.error(message);
-                this.emit(event.ERROR, [message]);
+                this.emit(event.ERROR, message);
             } else {
                 message = `geth: received signal: ${signal}`;
                 this.logger.info(message);
@@ -338,7 +338,7 @@ export default class GethConnector extends EventEmitter {
             /**
              * @event GethConnector#FAILED
              */
-            this.emit(event.FAILED, ['gethService']);
+            this.emit(event.FAILED, 'gethService');
         });
     }
 
@@ -373,32 +373,38 @@ export default class GethConnector extends EventEmitter {
             /**
              * @event GethConnector#ERROR
              */
-            this.emit(event.ERROR, ['geth connection timeout']);
+            this.emit(event.ERROR, 'geth connection timeout');
         }, 20000);
         const startFilter = (data: Buffer) => {
-            if (data.toString().includes('clock seems off')) {
+            let log = data.toString();
+            if (log.includes('clock seems off')) {
                 /**
                  * @event GethConnector#TIME_NOT_SYNCED
                  */
-                this.emit(event.TIME_NOT_SYNCED, [data.toString()]);
+                this.emit(event.TIME_NOT_SYNCED, log);
             }
-            if (data.toString().includes('Fatal') ||
-                data.toString().includes('Synchronisation failed')) {
+            if (log.includes('Fatal') ||
+                log.includes('Synchronisation failed')) {
                 /**
                  * @event GethConnector#FATAL
                  */
-                this.emit(event.FATAL, [data.toString()]);
+                this.emit(event.FATAL, log);
                 clearTimeout(timeout);
             }
-            if (data.toString().includes('IPC endpoint opened')) {
+            if (log.includes('IPC endpoint opened')) {
                 this.serviceStatus.process = true;
-                /**
-                 * @event GethConnector#STARTED
-                 */
-                this.emit(event.STARTED);
+                this._connectToIPC();
                 clearTimeout(timeout);
             }
-            this.logger.info(data.toString());
+            if (log.includes('imported ')) {
+                setTimeout(() => {
+                    /**
+                     * @event GethConnector#STARTED
+                     */
+                    this.emit(event.STARTED);
+                }, 2000);
+            }
+            this.logger.info(log);
         };
         // save a reference for removeListener
         this.watchers.set(event.START_FILTER, startFilter);
@@ -413,7 +419,9 @@ export default class GethConnector extends EventEmitter {
     private _attachListeners() {
         this.once(event.STARTED, () => {
             this._tailGethLog();
-            this._connectToIPC();
+        });
+        this.once(event.FATAL, () => {
+            this.socket.end();
         });
     }
 

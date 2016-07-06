@@ -31,13 +31,14 @@ describe('GethConnector', function () {
         });
     });
     it('should #start geth process', function (done) {
+        this.timeout(360000);
         const spy = sinon.spy();
         index_1.GethConnector.getInstance().once(events.STARTING, spy);
-        index_1.GethConnector.getInstance().once(events.STARTED, function () {
+        index_1.GethConnector.getInstance().once(events.IPC_CONNECTED, function () {
             done();
         });
-        index_1.GethConnector.getInstance().once(events.FATAL, function () {
-            throw new Error('could not start geth #FATAL');
+        index_1.GethConnector.getInstance().once(events.FATAL, function (err) {
+            throw new Error(`could not start geth #FATAL ${err}`);
         });
         index_1.GethConnector.getInstance().once(events.FAILED, function (reason) {
             throw new Error(`could not start geth #FAILED ${reason}`);
