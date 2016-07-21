@@ -2,7 +2,7 @@ import GethConnector from './GethConnector';
 import * as Promise from 'bluebird';
 import {TX_MINED} from './Constants';
 
-class GethHelper {
+export class GethHelper {
     public watcher: any;
     public txQueue = new Map();
     public syncing: boolean = true;

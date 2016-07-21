@@ -3,7 +3,7 @@ import Promise = require('bluebird');
 import {Socket} from 'net';
 
 export class Web3 {
-    public web3Instance: Web3Factory;
+    public web3Instance: any;
 
     constructor() {
         this.web3Instance = new Web3Factory();
@@ -23,7 +23,7 @@ export class Web3 {
     /**
      * @returns {Web3Factory}
      */
-    get web3() {
+    public get web3() {
         return this.web3Instance;
     }
 
