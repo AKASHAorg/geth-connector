@@ -269,7 +269,7 @@ export default class GethConnector extends EventEmitter {
              * @event GethConnector#DOWNLOADING_BINARY
              */
             this.emit(event.DOWNLOADING_BINARY);
-        }, 500);
+        }, 1000);
         return this.downloadManager.check().then((binPath) => {
             clearTimeout(timeOut);
             return binPath;
