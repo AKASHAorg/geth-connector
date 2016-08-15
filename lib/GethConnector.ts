@@ -1,12 +1,12 @@
-import {GethBin} from './GethBin';
-import {Web3} from './Web3';
-import {Socket} from 'net';
+import { GethBin } from './GethBin';
+import { Web3 } from './Web3';
+import { Socket } from 'net';
 import * as event from './Constants';
-import {EventEmitter} from 'events';
-import {spawn, ChildProcess} from 'child_process';
+import { EventEmitter } from 'events';
+import { spawn, ChildProcess } from 'child_process';
 import * as Promise from 'bluebird';
-import {type as osType, homedir} from 'os';
-import {join as pathJoin} from 'path';
+import { type as osType, homedir } from 'os';
+import { join as pathJoin } from 'path';
 
 const platform = osType();
 const symbolEnforcer = Symbol();
@@ -18,7 +18,7 @@ export default class GethConnector extends EventEmitter {
     public logger: any = console;
     public spawnOptions = new Map();
     public gethService: ChildProcess;
-    public serviceStatus: { process: boolean, api: boolean } = {process: false, api: false};
+    public serviceStatus: { process: boolean, api: boolean } = { process: false, api: false };
     private socket: Socket = new Socket();
     private connectedToLocal: boolean = false;
     public watchers = new Map();
@@ -81,7 +81,7 @@ export default class GethConnector extends EventEmitter {
             if (this.connectedToLocal) {
                 return false;
             }
-            this.gethService = spawn(binPath, this._flattenOptions(), {detached: true});
+            this.gethService = spawn(binPath, this._flattenOptions(), { detached: true });
             return true;
         }).then((passed: boolean) => {
             if (passed) {
@@ -367,6 +367,7 @@ export default class GethConnector extends EventEmitter {
      * @private
      */
     private _watchGethStd() {
+        let started = false;
         this.serviceStatus.process = false;
         const timeout = setTimeout(() => {
             this.gethService.stderr.removeAllListeners('data');
@@ -397,12 +398,13 @@ export default class GethConnector extends EventEmitter {
                 clearTimeout(timeout);
             }
             if (log.includes('imported ')) {
-                setTimeout(() => {
+                if (!started) {
                     /**
                      * @event GethConnector#STARTED
                      */
                     this.emit(event.STARTED);
-                }, 2000);
+                }
+                started = true;
             }
             this.logger.info(log);
         };
