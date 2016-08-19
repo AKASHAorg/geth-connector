@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/AkashaProject/geth-connector/compare/v1.0.8...v1.1.0) (2016-08-19)
+
+
+### Features
+
+* **binaries:** add new binary download source and executable name handling ([218e2e1](https://github.com/AkashaProject/geth-connector/commit/218e2e1))
+
+
+
 <a name="1.0.8"></a>
 ## [1.0.8](https://github.com/AkashaProject/geth-connector/compare/v1.0.7...v1.0.8) (2016-08-15)
 
