@@ -5,19 +5,12 @@ const sinon = require('sinon');
 const path_1 = require('path');
 const rimraf = require('rimraf');
 const chai_1 = require('chai');
+const TestRPC = require('ethereumjs-testrpc');
 const binPath = path_1.join(__dirname, 'testBin');
-const txQueue = [
-    '0xc52ea505a81076f98f3f56b893de417c524f98fa3a8bc66c0ba0edf73e52dca7',
-    '0xde6bbfbe189c1d4baa7791e485e17a0c27a362391c8446741ff99a03302c74e6',
-    '0x07dd3144fdd597692c7521af83e95f4accb6bb21738da72806c5de1af33517de',
-    '0xc93da25b1c88a6b0484b81e54163958ff9a1a4a9b7064c8e2ac6f14b9eab4a87'
-];
+let accounts = [];
 describe('GethConnector', function () {
     this.timeout(120000);
     before(function (done) {
-        txQueue.forEach(function (hash) {
-            index_1.gethHelper.addTxToWatch(hash, false);
-        });
         index_1.GethConnector.getInstance().setLogger({
             info: function () {
             },
@@ -43,6 +36,7 @@ describe('GethConnector', function () {
         index_1.GethConnector.getInstance().once(events.FAILED, function (reason) {
             throw new Error(`could not start geth #FAILED ${reason}`);
         });
+        index_1.GethConnector.getInstance().setOptions({ datadir: path_1.join(__dirname, 'testBin', 'chain') });
         index_1.GethConnector.getInstance().start();
         sinon.assert.calledOnce(spy);
     });
@@ -63,6 +57,10 @@ describe('GethConnector', function () {
             done();
         });
     });
+    it('should change web3 provider', function () {
+        index_1.GethConnector.getInstance().web3.setProvider(TestRPC.provider());
+        chai_1.expect(index_1.GethConnector.getInstance().web3.currentProvider.manager).to.be.an('object');
+    });
     it('should be able to call web3 methods', function (done) {
         chai_1.expect(index_1.GethConnector.getInstance().web3).to.exist;
         index_1.GethConnector.getInstance().web3.eth.getBlockAsync(0).then((data) => {
@@ -70,69 +68,81 @@ describe('GethConnector', function () {
             done();
         });
     });
+    it('should verify if address has local key', function (done) {
+        index_1.gethHelper.hasKey('0x0000000000000000000000000000000000000000').then((found) => {
+            chai_1.expect(found).to.be.false;
+        });
+        index_1.GethConnector.getInstance()
+            .web3
+            .eth
+            .getAccountsAsync()
+            .then((list) => {
+            accounts = list;
+            index_1.gethHelper.hasKey(list[0]).then((found) => {
+                chai_1.expect(found).to.be.true;
+                done();
+            });
+        });
+    });
     it('should get syncronization status', function (done) {
         index_1.gethHelper.inSync().then((data) => {
+            chai_1.expect(data).to.not.be.undefined;
             done();
         });
     });
-    it('should be able to append tx to queue', function () {
-        chai_1.expect(index_1.gethHelper
-            .addTxToWatch('0x8e5dce4185f942d34da7449eea20010d9eead8159631ef8a6ef725c86050d12f', false)).not.to.throw;
+    it('should be able to append tx to queue', function (done) {
+        index_1.GethConnector.getInstance()
+            .web3
+            .eth
+            .sendTransactionAsync({ from: accounts[0], to: accounts[1], value: 100 })
+            .then((tx) => {
+            chai_1.expect(index_1.gethHelper
+                .addTxToWatch(tx, false)).not.to.throw;
+            done();
+        });
     });
-    it.skip('should get notified when tx is mined', function (done) {
-        this.timeout(180000);
-        let calledTimes = 0;
-        const expectedTimes = index_1.gethHelper.txQueue.size;
-        const cb = (tx) => {
-            calledTimes++;
-            if (!index_1.gethHelper.watching) {
-                chai_1.expect(calledTimes).to.equal(expectedTimes);
-                index_1.GethConnector.getInstance().removeAllListeners(events.TX_MINED);
-                done();
-            }
-        };
-        index_1.GethConnector.getInstance().on(events.TX_MINED, cb);
-        function insync() {
-            index_1.gethHelper.inSync().then((data) => {
-                if (data.length === 0) {
-                    return chai_1.expect(index_1.gethHelper.startTxWatch()).not.to.throw;
-                }
-                return setTimeout(function () { insync(); }, 500);
-            });
-        }
-        insync();
-    });
-    it.skip('should autowatch new transaction', function (done) {
-        const txHash = '0x3273b3cf0cc4fbc5a32ad635c693c960f2e1a5789077b29255f875afa8e0251b';
+    it('should autowatch new transaction', function (done) {
+        let txHash;
         const cb = (tx) => {
             if (tx === txHash) {
                 index_1.GethConnector.getInstance().removeAllListeners(events.TX_MINED);
                 done();
             }
         };
+        index_1.gethHelper.syncing = false;
         index_1.GethConnector.getInstance().on(events.TX_MINED, cb);
-        index_1.gethHelper.addTxToWatch(txHash);
+        index_1.GethConnector.getInstance()
+            .web3
+            .eth
+            .sendTransactionAsync({ from: accounts[0], to: accounts[1], value: 200 })
+            .then((tx) => {
+            txHash = tx;
+            index_1.gethHelper.addTxToWatch(tx);
+        });
     });
-    it.skip('should autowatch multiple transactions', function (done) {
-        const txPool = [
-            '0x97215aeab84b8fc4d6398743ab4ba88c49b67cc4ee6c2e8adc139bd429dc371f',
-            '0xe76b6e7c5327fc03d33d84795dd697d3259ff4340d4a400b2865ee96c2fc9b31',
-            '0x6d8f06aff5e14694959c1fd9ab18775b07781d75b0fe0b65b5e5cf58a227b040',
-            '0x5a88ffee1023f6898138bf1790c2884257c63e573b375f7d1b195efd6d4f9de5',
-            '0x92c1abf1b0a8ac8a5a6d43255064ed95c17b2cbc898c46151656f9baaba23c63'
-        ];
+    it('should autowatch multiple transactions and emit when mined', function (done) {
+        const txPool = [1, 2, 3].map((value) => {
+            return index_1.GethConnector.getInstance()
+                .web3
+                .eth
+                .sendTransactionAsync({ from: accounts[0], to: accounts[1], value: 100 * value });
+        });
+        let lList = [];
         index_1.gethHelper.stopTxWatch();
         const cb = (tx) => {
-            const index = txPool.indexOf(tx);
-            txPool.splice(index, 1);
-            if (txPool.length === 0) {
+            const index = lList.indexOf(tx);
+            lList.splice(index, 1);
+            if (lList.length === 0) {
                 index_1.GethConnector.getInstance().removeAllListeners(events.TX_MINED);
                 done();
             }
         };
         index_1.GethConnector.getInstance().on(events.TX_MINED, cb);
-        txPool.forEach((tx) => {
-            index_1.gethHelper.addTxToWatch(tx);
+        Promise.all(txPool).then((list) => {
+            lList = list;
+            list.forEach((tx) => {
+                index_1.gethHelper.addTxToWatch(tx);
+            });
         });
     });
     it('should #stop geth process', function (done) {

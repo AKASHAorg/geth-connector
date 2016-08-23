@@ -81,6 +81,20 @@ export class GethHelper {
     }
 
     /**
+     * @param address
+     * @returns {Bluebird<boolean>|PromiseLike<boolean>|Thenable<boolean>|Promise<boolean>}
+     */
+    public hasKey(address: string) {
+        return GethConnector.getInstance()
+            .web3
+            .eth
+            .getAccountsAsync()
+            .then((list: string[]) => {
+                return list.indexOf(address) !== -1;
+            });
+    }
+
+    /**
      *
      * @returns {string}
      */

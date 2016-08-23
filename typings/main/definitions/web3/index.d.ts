@@ -37,3 +37,8 @@ declare class Web3 {
 declare module 'web3' {
     export = Web3;
 }
+
+declare module 'ethereumjs-testrpc' {
+    const exported: any;
+    export = exported;
+}

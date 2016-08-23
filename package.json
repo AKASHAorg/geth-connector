@@ -4,9 +4,10 @@
   "description": "Package used by AKASHA to manage geth/web3",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/index.js",
+    "test": "./node_modules/istanbul/lib/cli.js cover ./node_modules/.bin/_mocha  ./tests/index.js",
     "docs": "typedoc index.ts --out docs",
-    "release": "standard-version"
+    "release": "standard-version",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },
   "keywords": [
     "geth",
@@ -35,7 +36,11 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "coveralls": "^2.11.12",
+    "ethereumjs-testrpc": "^2.2.1",
+    "istanbul": "^0.4.5",
     "mocha": "^3.0.2",
+    "mocha-lcov-reporter": "^1.2.0",
     "rimraf": "^2.5.3",
     "sinon": "^1.17.4",
     "standard-version": "^2.4.0",
