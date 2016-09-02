@@ -23,10 +23,16 @@ describe('GethConnector', function () {
             done();
         });
     });
+    it('should write genesis block', function (done) {
+        index_1.GethConnector.getInstance().setOptions({ datadir: path_1.join(__dirname, 'testBin', 'chain') });
+        index_1.GethConnector.getInstance().writeGenesis(path_1.join(__dirname, 'genesis.json'), (err, data) => {
+            chai_1.expect(err).to.not.exist;
+            done();
+        });
+    });
     it('should #start geth process', function (done) {
         this.timeout(360000);
         const spy = sinon.spy();
-        index_1.GethConnector.getInstance().setOptions({ testnet: '' });
         index_1.GethConnector.getInstance().once(events.STARTING, spy);
         index_1.GethConnector.getInstance().once(events.IPC_CONNECTED, function () {
             done();
@@ -37,7 +43,6 @@ describe('GethConnector', function () {
         index_1.GethConnector.getInstance().once(events.FAILED, function (reason) {
             throw new Error(`could not start geth #FAILED ${reason}`);
         });
-        index_1.GethConnector.getInstance().setOptions({ datadir: path_1.join(__dirname, 'testBin', 'chain') });
         index_1.GethConnector.getInstance().start();
         sinon.assert.calledOnce(spy);
     });

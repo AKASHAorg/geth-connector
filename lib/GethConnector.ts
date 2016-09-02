@@ -3,7 +3,7 @@ import { Web3 } from './Web3';
 import { Socket } from 'net';
 import * as event from './Constants';
 import { EventEmitter } from 'events';
-import { spawn, ChildProcess } from 'child_process';
+import { spawn, ChildProcess, exec } from 'child_process';
 import * as Promise from 'bluebird';
 import { type as osType, homedir } from 'os';
 import { join as pathJoin } from 'path';
@@ -207,6 +207,25 @@ export default class GethConnector extends EventEmitter {
             .resolve(this.stop())
             .delay(waitTime)
             .then(() => this.start());
+    }
+
+    /**
+     *
+     * @param genesisPath
+     * @param cb
+     */
+    writeGenesis(genesisPath: string, cb: any) {
+        this._checkBin().then((binPath: string) => {
+            if (binPath) {
+                let command = this._flattenOptions().reduce((execString, option) => {
+                    return `${execString} ${option}`;
+                });
+                command += ` init ${genesisPath}`;
+                exec(`${binPath} ${command}`, (error, stdout) => {
+                   cb(error, stdout);
+                });
+            }
+        });
     }
 
     /**

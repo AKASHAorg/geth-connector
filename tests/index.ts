@@ -24,10 +24,19 @@ describe('GethConnector', function () {
         });
     });
 
+    it('should write genesis block', function (done) {
+        GethConnector.getInstance().setOptions({ datadir: pathJoin(__dirname, 'testBin', 'chain') });
+        GethConnector.getInstance().writeGenesis(
+            pathJoin(__dirname, 'genesis.json'),
+            (err: Error, data: any) => {
+                expect(err).to.not.exist;
+                done();
+            });
+    });
+
     it('should #start geth process', function (done) {
         this.timeout(360000);
         const spy = sinon.spy();
-        GethConnector.getInstance().setOptions({testnet: ''});
         GethConnector.getInstance().once(events.STARTING, spy);
         GethConnector.getInstance().once(events.IPC_CONNECTED, function () {
             done();
@@ -39,7 +48,6 @@ describe('GethConnector', function () {
         GethConnector.getInstance().once(events.FAILED, function (reason: string) {
             throw new Error(`could not start geth #FAILED ${reason}`);
         });
-        GethConnector.getInstance().setOptions({ datadir: pathJoin(__dirname, 'testBin', 'chain') });
         GethConnector.getInstance().start();
         sinon.assert.calledOnce(spy);
     });
@@ -109,7 +117,7 @@ describe('GethConnector', function () {
         GethConnector.getInstance()
             .web3
             .eth
-            .sendTransactionAsync({from: accounts[0], to: accounts[1], value: 100})
+            .sendTransactionAsync({ from: accounts[0], to: accounts[1], value: 100 })
             .then((tx: string) => {
                 expect(
                     gethHelper
@@ -132,7 +140,7 @@ describe('GethConnector', function () {
         GethConnector.getInstance()
             .web3
             .eth
-            .sendTransactionAsync({from: accounts[0], to: accounts[1], value: 200})
+            .sendTransactionAsync({ from: accounts[0], to: accounts[1], value: 200 })
             .then((tx: string) => {
                 txHash = tx;
                 gethHelper.addTxToWatch(tx);
@@ -144,7 +152,7 @@ describe('GethConnector', function () {
             return GethConnector.getInstance()
                 .web3
                 .eth
-                .sendTransactionAsync({from: accounts[0], to: accounts[1], value: 100 * value});
+                .sendTransactionAsync({ from: accounts[0], to: accounts[1], value: 100 * value });
         });
         let lList: any[] = [];
         gethHelper.stopTxWatch();
