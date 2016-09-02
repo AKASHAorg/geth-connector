@@ -1,6 +1,6 @@
 import Web3Factory = require('web3');
 import Promise = require('bluebird');
-import {Socket} from 'net';
+import { Socket } from 'net';
 
 export class Web3 {
     public web3Instance: any;
@@ -14,7 +14,8 @@ export class Web3 {
         this.web3Instance.version = Promise.promisifyAll(this.web3Instance.version);
         this.web3Instance._extend({
             property: 'admin',
-            properties: this._adminProps().properties
+            properties: this._adminProps().properties,
+            methods: this._adminProps().methods
         });
 
         this.web3Instance.admin = Promise.promisifyAll(this.web3Instance.admin);
@@ -28,7 +29,7 @@ export class Web3 {
     }
 
     /**
-     * 
+     *
      * @param gethIpc
      * @param socket
      * @returns {boolean}
@@ -48,6 +49,14 @@ export class Web3 {
      */
     _adminProps() {
         return {
+            methods: [
+                new this.web3Instance._extend.Method({
+                    name: 'addPeer',
+                    call: 'admin_addPeer',
+                    params: 1,
+                    inputFormatter: [null],
+                    outputFormatter: this.web3Instance._extend.formatters.formatOutputBool
+                })],
             properties: [
                 new this.web3Instance._extend.Property({
                     name: 'nodeInfo',
