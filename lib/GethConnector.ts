@@ -476,14 +476,18 @@ export default class GethConnector extends EventEmitter {
 
         return Promise.all(runningServiceProps).then(([buildVersion, networkId]) => {
             let message: string;
+            networkId = parseInt(networkId, 10);
             if (!buildVersion.includes(requiredVersion)) {
                 message = `required geth version: ${requiredVersion}, found: ${buildVersion}`;
                 this.logger.warn(message);
                 this.emit(event.ERROR, message);
             }
-
-            if (networkId !== event.ETH_NETWORK_ID) {
-                message = `required ethereum network: ${event.ETH_NETWORK_ID}, found: ${networkId}`;
+            let netId = this.spawnOptions.get('networkid');
+            if (this.spawnOptions.has('testnet')) {
+                netId = 2;
+            }
+            if (netId && networkId !== netId) {
+                message = `required ethereum network: ${netId}, found: ${networkId}`;
                 this.logger.error(message);
                 this.emit(event.FATAL, message);
                 return false;

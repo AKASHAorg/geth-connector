@@ -13,8 +13,7 @@ export const IPC_DISCONNECTED = 'GETH_IPC_DISCONNECTED';
 export const ETH_NODE_OK = 'ETH_NODE_OK';
 export const TX_MINED = 'TX_MINED';
 
-export const START_OPTIONS = {cache: 512, shh: '', fast: '', testnet: ''};
-export const ETH_NETWORK_ID = '2'; // MORDEN
+export const START_OPTIONS = {cache: 512, fast: ''};
 export const BIN_PATH = 'binPath';
 export const START_FILTER = 'START_FILTER';
 export const INFO_FILTER = 'INFO_FILTER';

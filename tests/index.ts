@@ -9,7 +9,7 @@ import TestRPC = require('ethereumjs-testrpc');
 const binPath = pathJoin(__dirname, 'testBin');
 let accounts: string[] = [];
 describe('GethConnector', function () {
-    this.timeout(120000);
+    this.timeout(60000);
     before(function (done) {
         GethConnector.getInstance().setLogger({
             info: function () {
@@ -27,6 +27,7 @@ describe('GethConnector', function () {
     it('should #start geth process', function (done) {
         this.timeout(360000);
         const spy = sinon.spy();
+        GethConnector.getInstance().setOptions({testnet: ''});
         GethConnector.getInstance().once(events.STARTING, spy);
         GethConnector.getInstance().once(events.IPC_CONNECTED, function () {
             done();
@@ -173,7 +174,7 @@ describe('GethConnector', function () {
 
     after(function (done) {
         rimraf(binPath, function () {
-            GethConnector.getInstance().removeAllListeners(events.TX_MINED)
+            GethConnector.getInstance().removeAllListeners(events.TX_MINED);
             done();
         });
     });
