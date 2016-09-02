@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/AkashaProject/geth-connector/compare/v1.2.1...v1.3.0) (2016-09-02)
+
+
+### Features
+
+* **options:** add method to write genesis block ([14bb8ed](https://github.com/AkashaProject/geth-connector/commit/14bb8ed))
+
+
+
 <a name="1.2.1"></a>
 ## [1.2.1](https://github.com/AkashaProject/geth-connector/compare/v1.2.0...v1.2.1) (2016-09-02)
 
