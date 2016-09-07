@@ -40,11 +40,16 @@ export class GethHelper {
 
     /**
      * @fires GethConnector#TX_MINED
-     * @returns {boolean}
+     * @returns {any}
      */
-    public startTxWatch() {
+    public startTxWatch(): any {
         if (this.syncing) {
-            throw new Error('Geth node is syncing, try calling #inSync() before this');
+            return this.inSync().then(() => {
+                if (this.syncing) {
+                    throw new Error('Geth node is syncing, try calling #inSync() before this');
+                }
+                return this.startTxWatch();
+            });
         }
         if (this.txQueue.size === 0) {
             return;
@@ -77,7 +82,7 @@ export class GethHelper {
                 });
             });
         });
-        return true;
+        return Promise.resolve(this.watching);
     }
 
     /**
