@@ -173,6 +173,15 @@ describe('GethConnector', function () {
         });
     });
 
+    it('should start and stop multiple times', function (done) {
+       const interval = setInterval(()=> {
+           GethConnector.getInstance().stop().delay(500).then(()=> {
+               GethConnector.getInstance().start();
+           })
+       }, 1500);
+        setTimeout(()=> { clearInterval(interval); done(); }, 30000);
+    });
+
     it('should #stop geth process', function (done) {
         const spy = sinon.spy();
         GethConnector.getInstance().on(events.STOPPING, spy);

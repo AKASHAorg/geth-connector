@@ -105,7 +105,7 @@ export class GethHelper {
      */
     public stopTxWatch() {
         this.watching = false;
-        return (this.watcher) ? this.watcher.stopWatching() : '';
+        return (this.watcher) ? this.watcher.stopWatching(()=>{}) : '';
     }
 
     /**

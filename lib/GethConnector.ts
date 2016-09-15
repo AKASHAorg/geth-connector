@@ -438,12 +438,12 @@ export default class GethConnector extends EventEmitter {
      * @private
      */
     private _attachListeners() {
-        this.once(event.STARTED, () => {
-            this._tailGethLog();
-        });
-        this.once(event.FATAL, () => {
-            this.socket.end();
-        });
+
+        this.removeListener(event.STARTED, this._tailGethLog);
+        this.removeListener(event.FATAL, this.socket.end);
+
+        this.once(event.STARTED, this._tailGethLog);
+        this.once(event.FATAL, this.socket.end);
     }
 
     /**
