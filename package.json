@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "chai": "3.5.0",
-    "coveralls": "2.11.12",
+    "coveralls": "2.11.13",
     "ethereumjs-testrpc": "2.2.7",
     "istanbul": "0.4.5",
     "mocha": "3.0.2",
