@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.4.4"></a>
+## [1.4.4](https://github.com/AkashaProject/geth-connector/compare/v1.4.3...v1.4.4) (2016-09-19)
+
+
+### Bug Fixes
+
+* **serviceStatus:** mark api status as closed when geth is stopped ([5fca263](https://github.com/AkashaProject/geth-connector/commit/5fca263))
+
+
+
 <a name="1.4.3"></a>
 ## [1.4.3](https://github.com/AkashaProject/geth-connector/compare/v1.4.2...v1.4.3) (2016-09-15)
 
