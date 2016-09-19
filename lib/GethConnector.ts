@@ -139,6 +139,7 @@ export default class GethConnector extends EventEmitter {
      */
     private _flushEvents() {
         this.web3.reset();
+        this.serviceStatus.api = false;
         this.socket.removeAllListeners();
         if (!this.connectedToLocal) {
             if (this.watchers.get(event.START_FILTER)) {
