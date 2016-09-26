@@ -1,12 +1,11 @@
 declare module 'bin-wrapper' {
-    class BinWrapper {
+    export default class BinWrapperGeth {
         constructor(options?: any);
-        src(path: string, platform: string, arch: string): BinWrapper;
-        dest(path: string): BinWrapper;
-        use(path: string): BinWrapper;
+        src(path: string, platform: string, arch: string): BinWrapperGeth;
+        dest(path: string): BinWrapperGeth;
+        use(path: string): BinWrapperGeth;
         run(command: Array<string>, callback: any): any;
         path: () => string;
-        version(range: string): BinWrapper;
+        version(range: string): BinWrapperGeth;
     }
-    export default BinWrapper;
 }
