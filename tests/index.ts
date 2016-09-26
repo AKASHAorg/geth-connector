@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import { join as pathJoin } from 'path';
 import * as rimraf from 'rimraf';
 import { expect } from 'chai';
-import TestRPC from 'ethereumjs-testrpc';
+import TestRPC = require('ethereumjs-testrpc');
 
 const binPath = pathJoin(__dirname, 'testBin');
 let accounts: string[] = [];

@@ -1,6 +1,6 @@
 /// <reference path="../typings/main.d.ts"/>
 import * as Promise from 'bluebird';
-import Wrapper from 'bin-wrapper';
+import Wrapper = require('bin-wrapper');
 import * as path from 'path';
 import * as url from 'url';
 
