@@ -1,5 +1,5 @@
-import Web3Factory = require('web3');
-import Promise = require('bluebird');
+import Web3Factory from 'web3';
+import * as Promise from 'bluebird';
 import { Socket } from 'net';
 
 export class Web3 {

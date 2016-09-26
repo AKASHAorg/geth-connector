@@ -1,7 +1,7 @@
 /// <reference path="../typings/main.d.ts" />
 /// <reference types="bluebird" />
-import Promise = require('bluebird');
-import Wrapper = require('bin-wrapper');
+import * as Promise from 'bluebird';
+import Wrapper from 'bin-wrapper';
 export declare class GethBin {
     wrapper: Wrapper;
     constructor(target?: string);

@@ -53,8 +53,7 @@
     "sinon": "1.17.6",
     "standard-version": "2.4.0",
     "tslint": "3.15.1",
-    "typescript": "2.0.3",
-    "typings": "1.4.0"
+    "typescript": "2.0.3"
   },
   "directories": {
     "test": "tests"

@@ -1,8 +1,8 @@
 /// <reference path="../typings/main.d.ts"/>
-import Promise = require('bluebird');
-import Wrapper = require('bin-wrapper');
-import path = require('path');
-import url = require('url');
+import * as Promise from 'bluebird';
+import Wrapper from 'bin-wrapper';
+import * as path from 'path';
+import * as url from 'url';
 
 const defaultTarget = path.join(__dirname, 'bin');
 

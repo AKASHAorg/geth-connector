@@ -35,10 +35,12 @@ declare class Web3 {
 }
 
 declare module 'web3' {
-    export = Web3;
+    export default Web3;
 }
 
 declare module 'ethereumjs-testrpc' {
-    const exported: any;
-    export = exported;
+    class TestRpc extends Web3 {
+        static provider(): any;
+    }
+    export default TestRpc;
 }
