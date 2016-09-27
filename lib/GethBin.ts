@@ -7,14 +7,14 @@ import * as url from 'url';
 const defaultTarget = path.join(__dirname, 'bin');
 
 const repo = 'https://github.com/ethereum/go-ethereum/releases/download/';
-const gethVersion = 'v1.4.11/';
+const gethVersion = 'v1.4.13/';
 
 const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
-    linux: 'geth-Linux64-20160819135300-1.4.11-fed692f.tar.bz2',
-    win: 'Geth-Win64-20160818153642-1.4.11-fed692f.zip',
-    osx: 'geth-OSX-20160818153612-1.4.11-fed692f.zip'
+    linux: 'geth-Linux64-20160926125500-1.4.13-8f0db697.tar.bz2',
+    win: 'geth-windows-amd64-1.4.13-8f0db697.zip',
+    osx: 'geth-OSX-20160926130115-1.4.13-8f0db697.zip'
 };
 
 const getDownloadUrl = (archive: string): string => {
@@ -22,7 +22,7 @@ const getDownloadUrl = (archive: string): string => {
 };
 
 export class GethBin {
-    public wrapper: Wrapper;
+    public wrapper: any;
 
     /**
      * @param target    Folder path for `target` geth executable
