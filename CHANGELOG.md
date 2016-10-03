@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.5.8"></a>
+## [1.5.8](https://github.com/AkashaProject/geth-connector/compare/v1.5.7...v1.5.8) (2016-10-03)
+
+
+### Bug Fixes
+
+* **init:** add required format for windows ([a490f09](https://github.com/AkashaProject/geth-connector/commit/a490f09))
+
+
+
 <a name="1.5.7"></a>
 ## [1.5.7](https://github.com/AkashaProject/geth-connector/compare/v1.5.6...v1.5.7) (2016-09-27)
 
