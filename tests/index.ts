@@ -195,7 +195,7 @@ describe('GethConnector', function () {
            GethConnector.getInstance().stop().delay(500).then(()=> {
                GethConnector.getInstance().start();
            })
-       }, 1500);
+       }, 4500);
         setTimeout(()=> { clearInterval(interval); done(); }, 30000);
     });
 

@@ -173,12 +173,12 @@ export default class GethConnector extends EventEmitter {
      */
     public setOptions(options?: any) {
         let localOptions: Object;
-        if(options){
-            if(platform === 'Windows_NT' && options.hasOwnProperty('ipcpath')) {
+        if (options) {
+            if (platform === 'Windows_NT' && options.hasOwnProperty('ipcpath')) {
                 options.ipcpath = pathJoin('\\\\.\\pipe', options.ipcpath);
             }
 
-            if(platform !== 'Windows_NT' && options.hasOwnProperty('datadir') && !options.hasOwnProperty('ipcpath')) {
+            if (platform !== 'Windows_NT' && options.hasOwnProperty('datadir') && !options.hasOwnProperty('ipcpath')) {
                 options.ipcpath = pathJoin(options.datadir, 'geth.ipc');
             }
         }
@@ -228,11 +228,11 @@ export default class GethConnector extends EventEmitter {
     writeGenesis(genesisPath: string, cb: any) {
         this._checkBin().then((binPath: string) => {
             if (binPath) {
-                const dataDir = (this.spawnOptions.get('datadir')) ? this.spawnOptions.get('datadir'): GethConnector.getDefaultDatadir();
+                const dataDir = (this.spawnOptions.get('datadir')) ? this.spawnOptions.get('datadir') : GethConnector.getDefaultDatadir();
                 let command = `--datadir="${dataDir}"`;
                 command += ` init ${genesisPath}`;
                 exec(`${binPath} ${command}`, (error, stdout) => {
-                   cb(error, stdout);
+                    cb(error, stdout);
                 });
             }
         });
