@@ -77,7 +77,7 @@ export class GethHelper {
                         /**
                          * @event GethConnector#TX_MINED
                          */
-                        GethConnector.getInstance().emit(TX_MINED, data.transactionHash);
+                        GethConnector.getInstance().emit(TX_MINED, data);
                     }
                 });
             });

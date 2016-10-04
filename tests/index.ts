@@ -129,8 +129,8 @@ describe('GethConnector', function () {
 
     it('should autowatch new transaction', function (done) {
         let txHash: string;
-        const cb = (tx: string) => {
-            if (tx === txHash) {
+        const cb = (tx: any) => {
+            if (tx.transactionHash === txHash) {
                 GethConnector.getInstance().removeAllListeners(events.TX_MINED);
                 done();
             }
@@ -156,8 +156,8 @@ describe('GethConnector', function () {
         });
         let lList: any[] = [];
         gethHelper.stopTxWatch();
-        const cb = (tx: string) => {
-            const index = lList.indexOf(tx);
+        const cb = (tx: any) => {
+            const index = lList.indexOf(tx.transactionHash);
             lList.splice(index, 1);
             if (lList.length === 0) {
                 GethConnector.getInstance().removeAllListeners(events.TX_MINED);
