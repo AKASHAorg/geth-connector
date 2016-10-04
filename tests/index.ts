@@ -4,9 +4,11 @@ import * as sinon from 'sinon';
 import { join as pathJoin } from 'path';
 import * as rimraf from 'rimraf';
 import { expect } from 'chai';
+import { type as osType } from 'os';
 import TestRPC = require('ethereumjs-testrpc');
 
 const binPath = pathJoin(__dirname, 'testBin');
+const platform = osType();
 let accounts: string[] = [];
 describe('GethConnector', function () {
     this.timeout(60000);
@@ -22,6 +24,21 @@ describe('GethConnector', function () {
         rimraf(binPath, function () {
             done();
         });
+    });
+
+    it('should set spawn options', function() {
+        const datadir = pathJoin(__dirname, 'testBin', 'chain');
+        const ipcpath = pathJoin(__dirname, 'testBin', 'chain', 'gethTest.ipc');
+        let expected: any;
+        GethConnector.getInstance().setOptions({ datadir});
+        expect(GethConnector.getInstance().spawnOptions.get('datadir')).to.equal(datadir);
+
+        expected = (platform !== 'Windows_NT')? pathJoin(datadir, 'geth.ipc'): GethConnector.getDefaultIpcPath();
+        expect(GethConnector.getInstance().spawnOptions.get('ipcpath')).to.equal(expected);
+
+        GethConnector.getInstance().setOptions({ipcpath});
+        expected = (platform !== 'Windows_NT')? ipcpath: pathJoin('\\\\.\\pipe', ipcpath);
+        expect(GethConnector.getInstance().spawnOptions.get('ipcpath')).to.equal(expected);
     });
 
     it('should write genesis block', function (done) {
