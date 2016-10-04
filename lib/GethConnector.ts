@@ -173,12 +173,7 @@ export default class GethConnector extends EventEmitter {
      */
     public setOptions(options?: any) {
         let localOptions: Object;
-        if (this.spawnOptions.size) {
-            if (!options) {
-                return this.spawnOptions;
-            }
-            localOptions = options;
-        } else {
+        if(options){
             if(platform === 'Windows_NT' && options.hasOwnProperty('ipcpath')) {
                 options.ipcpath = pathJoin('\\\\.\\pipe', options.ipcpath);
             }
@@ -186,7 +181,14 @@ export default class GethConnector extends EventEmitter {
             if(platform !== 'Windows_NT' && options.hasOwnProperty('datadir') && !options.hasOwnProperty('ipcpath')) {
                 options.ipcpath = pathJoin(options.datadir, 'geth.ipc');
             }
+        }
 
+        if (this.spawnOptions.size) {
+            if (!options) {
+                return this.spawnOptions;
+            }
+            localOptions = options;
+        } else {
             localOptions = Object.assign(
                 {
                     datadir: GethConnector.getDefaultDatadir(),
