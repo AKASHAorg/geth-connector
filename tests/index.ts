@@ -31,6 +31,7 @@ describe('GethConnector', function () {
         const ipcpath = pathJoin(__dirname, 'testBin', 'chain', 'gethTest.ipc');
         let expected: any;
         GethConnector.getInstance().setOptions({ datadir });
+        GethConnector.getInstance().setBinPath(binPath);
         expect(GethConnector.getInstance().spawnOptions.get('datadir')).to.equal(datadir);
 
         expected = (platform !== 'Windows_NT') ? pathJoin(datadir, 'geth.ipc') : GethConnector.getDefaultIpcPath();
@@ -42,17 +43,25 @@ describe('GethConnector', function () {
     });
 
     it('should write genesis block', function (done) {
+        let downloaded = false;
+        GethConnector.getInstance().once(events.DOWNLOADING_BINARY, () => {
+            downloaded = true;
+        });
+        GethConnector.getInstance().once(events.BINARY_CORRUPTED, function () {
+            // explicit fail
+            throw new Error('There was a problem with geth binary');
+        });
         GethConnector.getInstance().setOptions({ datadir: pathJoin(__dirname, 'testBin', 'chain') });
         GethConnector.getInstance().writeGenesis(
             pathJoin(__dirname, 'genesis.json'),
             (err: Error, data: any) => {
                 expect(err).to.not.exist;
+                expect(downloaded).to.be.true;
                 done();
             });
     });
 
     it('should #start geth process', function (done) {
-        this.timeout(360000);
         const spy = sinon.spy();
         GethConnector.getInstance().once(events.STARTING, spy);
         GethConnector.getInstance().once(events.IPC_CONNECTED, function () {
@@ -69,25 +78,12 @@ describe('GethConnector', function () {
         sinon.assert.calledOnce(spy);
     });
 
-    it('should emit downloading event', function (done) {
-        // set the new bin path
-        GethConnector.getInstance().setBinPath(binPath);
-        GethConnector.getInstance().once(events.DOWNLOADING_BINARY, function () {
-            done();
-        });
-
-        GethConnector.getInstance().once(events.BINARY_CORRUPTED, function () {
-            // explicit fail
-            throw new Error('There was a problem with geth binary');
-        });
-        GethConnector.getInstance().restart();
-    });
 
     it('should detect required version for geth', function (done) {
         let timeOut: any;
         GethConnector.getInstance().once(events.ETH_NODE_OK, function () {
             done();
-            if(timeOut){
+            if (timeOut) {
                 clearTimeout(timeOut);
             }
         });
