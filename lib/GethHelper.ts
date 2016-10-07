@@ -1,6 +1,6 @@
 import GethConnector from './GethConnector';
 import * as Promise from 'bluebird';
-import {TX_MINED} from './Constants';
+import { TX_MINED } from './Constants';
 
 export class GethHelper {
     public watcher: any;
@@ -105,7 +105,7 @@ export class GethHelper {
      */
     public stopTxWatch() {
         this.watching = false;
-        return (this.watcher) ? this.watcher.stopWatching(()=>{}) : '';
+        return (this.watcher) ? this.watcher.stopWatching(()=> {}) : '';
     }
 
     /**

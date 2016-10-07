@@ -26,18 +26,18 @@ describe('GethConnector', function () {
         });
     });
 
-    it('should set spawn options', function() {
+    it('should set spawn options', function () {
         const datadir = pathJoin(__dirname, 'testBin', 'chain');
         const ipcpath = pathJoin(__dirname, 'testBin', 'chain', 'gethTest.ipc');
         let expected: any;
-        GethConnector.getInstance().setOptions({ datadir});
+        GethConnector.getInstance().setOptions({ datadir });
         expect(GethConnector.getInstance().spawnOptions.get('datadir')).to.equal(datadir);
 
-        expected = (platform !== 'Windows_NT')? pathJoin(datadir, 'geth.ipc'): GethConnector.getDefaultIpcPath();
+        expected = (platform !== 'Windows_NT') ? pathJoin(datadir, 'geth.ipc') : GethConnector.getDefaultIpcPath();
         expect(GethConnector.getInstance().spawnOptions.get('ipcpath')).to.equal(expected);
 
-        GethConnector.getInstance().setOptions({ipcpath});
-        expected = (platform !== 'Windows_NT')? ipcpath: pathJoin('\\\\.\\pipe', ipcpath);
+        GethConnector.getInstance().setOptions({ ipcpath });
+        expected = (platform !== 'Windows_NT') ? ipcpath : pathJoin('\\\\.\\pipe', ipcpath);
         expect(GethConnector.getInstance().spawnOptions.get('ipcpath')).to.equal(expected);
     });
 
@@ -191,12 +191,15 @@ describe('GethConnector', function () {
     });
 
     it('should start and stop multiple times', function (done) {
-       const interval = setInterval(()=> {
-           GethConnector.getInstance().stop().delay(500).then(()=> {
-               GethConnector.getInstance().start();
-           })
-       }, 4500);
-        setTimeout(()=> { clearInterval(interval); done(); }, 30000);
+        const interval = setInterval(()=> {
+            GethConnector.getInstance().stop().delay(500).then(()=> {
+                GethConnector.getInstance().start();
+            })
+        }, 4500);
+        setTimeout(()=> {
+            clearInterval(interval);
+            done();
+        }, 30000);
     });
 
     it('should #stop geth process', function (done) {
