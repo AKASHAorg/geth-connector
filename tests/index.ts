@@ -80,16 +80,21 @@ describe('GethConnector', function () {
             // explicit fail
             throw new Error('There was a problem with geth binary');
         });
-        setTimeout(function () {
-            // trigger downloading
-            GethConnector.getInstance().restart();
-        }, 7000);
+        GethConnector.getInstance().restart();
     });
 
     it('should detect required version for geth', function (done) {
+        let timeOut: any;
         GethConnector.getInstance().once(events.ETH_NODE_OK, function () {
             done();
+            if(timeOut){
+                clearTimeout(timeOut);
+            }
         });
+        timeOut = setTimeout(function () {
+            // trigger downloading
+            GethConnector.getInstance().restart();
+        }, 7000);
     });
 
     it('should change web3 provider', function () {
@@ -199,7 +204,7 @@ describe('GethConnector', function () {
         setTimeout(()=> {
             clearInterval(interval);
             done();
-        }, 30000);
+        }, 15000);
     });
 
     it('should #stop geth process', function (done) {
