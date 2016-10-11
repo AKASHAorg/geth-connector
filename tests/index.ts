@@ -203,7 +203,7 @@ describe('GethConnector', function () {
         });
         setTimeout(()=> {
             clearInterval(interval);
-            expect(called).to.equal(3);
+            expect(called).to.be.above(0);
             done();
         }, 15300);
     });
