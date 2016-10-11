@@ -205,7 +205,7 @@ describe('GethConnector', function () {
             clearInterval(interval);
             expect(called).to.equal(3);
             done();
-        }, 15000);
+        }, 15300);
     });
 
     it('should #stop geth process', function (done) {
