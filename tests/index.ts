@@ -55,11 +55,9 @@ describe('GethConnector', function () {
         GethConnector.getInstance().writeGenesis(
             pathJoin(__dirname, 'genesis.json'),
             (err: Error, data: any) => {
-                setTimeout(()=> {
-                    expect(err).to.not.exist;
-                    expect(downloaded).to.be.true;
-                    done();
-                }, 1100);
+                expect(err).to.not.exist;
+                expect(downloaded).to.be.true;
+                done();
             });
     });
 
