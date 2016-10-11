@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.6.4"></a>
+## [1.6.4](https://github.com/AkashaProject/geth-connector/compare/v1.6.3...v1.6.4) (2016-10-11)
+
+
+### Bug Fixes
+
+* **nex.socket:** create new instance on start ([c0b0dc3](https://github.com/AkashaProject/geth-connector/commit/c0b0dc3))
+
+
+
 <a name="1.6.3"></a>
 ## [1.6.3](https://github.com/AkashaProject/geth-connector/compare/v1.6.2...v1.6.3) (2016-10-07)
 
