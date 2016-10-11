@@ -19,7 +19,7 @@ export default class GethConnector extends EventEmitter {
     public spawnOptions = new Map();
     public gethService: ChildProcess;
     public serviceStatus: { process: boolean, api: boolean } = { process: false, api: false };
-    private socket: Socket = new Socket();
+    private socket: Socket;
     private connectedToLocal: boolean = false;
     public watchers = new Map();
 
@@ -69,6 +69,7 @@ export default class GethConnector extends EventEmitter {
          */
         this.emit(event.STARTING);
         this.setOptions(options);
+        this.socket = new Socket();
         return this._checkBin().then((binPath: string) => {
             if (!binPath) {
                 /**
@@ -162,7 +163,9 @@ export default class GethConnector extends EventEmitter {
                     .delete(event.INFO_FILTER);
             }
         }
-        return this.socket.end();
+        this.socket.end();
+        this.socket = null;
+        return true;
     }
 
     /**

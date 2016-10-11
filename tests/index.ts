@@ -192,13 +192,18 @@ describe('GethConnector', function () {
     });
 
     it('should start and stop multiple times', function (done) {
+        let called = 0;
         const interval = setInterval(()=> {
             GethConnector.getInstance().stop().delay(500).then(()=> {
                 GethConnector.getInstance().start();
             })
         }, 4500);
+        GethConnector.getInstance().on(events.IPC_CONNECTED, () => {
+            called++;
+        });
         setTimeout(()=> {
             clearInterval(interval);
+            expect(called).to.equal(3);
             done();
         }, 15000);
     });

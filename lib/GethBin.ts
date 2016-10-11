@@ -7,14 +7,14 @@ import * as url from 'url';
 const defaultTarget = path.join(__dirname, 'bin');
 
 const repo = 'https://github.com/ethereum/go-ethereum/releases/download/';
-const gethVersion = 'v1.4.16/';
+const gethVersion = 'v1.4.17/';
 
 const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
-    linux: 'geth-linux-amd64-1.4.16-4fced097.tar.gz',
-    win: 'geth-windows-amd64-1.4.16-4fced097.zip',
-    osx: 'geth-darwin-amd64-1.4.16-4fced097.tar.gz'
+    linux: 'geth-linux-amd64-1.4.17-5a6008e0.tar.gz',
+    win: 'geth-windows-amd64-1.4.17-5a6008e0.zip',
+    osx: 'geth-darwin-amd64-1.4.17-5a6008e0.tar.gz'
 };
 
 const getDownloadUrl = (archive: string): string => {
