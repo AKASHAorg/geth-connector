@@ -429,12 +429,12 @@ export default class GethConnector extends EventEmitter {
                 this._connectToIPC();
                 clearTimeout(timeout);
             }
-            if (log.includes('imported ')) {
+            if (log.includes('mapped network ')) {
                 if (!started) {
                     /**
                      * @event GethConnector#STARTED
                      */
-                    this.emit(event.STARTED);
+                    setTimeout(() => this.emit(event.STARTED), 2000);
                 }
                 started = true;
             }
