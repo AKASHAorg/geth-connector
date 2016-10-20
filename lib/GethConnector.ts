@@ -296,22 +296,29 @@ export default class GethConnector extends EventEmitter {
      * @private
      */
     private _checkBin() {
-        const timeOut = setTimeout(() => {
-            /**
-             * @event GethConnector#DOWNLOADING_BINARY
-             */
-            this.emit(event.DOWNLOADING_BINARY);
-        }, 1000);
-        return this.downloadManager.check().then((binPath) => {
-            clearTimeout(timeOut);
-            return binPath;
-        }).catch(err => {
-            /**
-             * @event GethConnector#BINARY_CORRUPTED
-             */
-            this.emit(event.BINARY_CORRUPTED, err);
-            this.logger.error(err);
-            return '';
+        return new Promise((resolve, reject) => {
+            this.downloadManager.check(
+                (err: Error, data:{binPath?: string, downloading?: boolean}) => {
+                    if(err){
+                        this.logger.error(err);
+                        /**
+                         * @event GethConnector#BINARY_CORRUPTED
+                         */
+                        this.emit(event.BINARY_CORRUPTED, err);
+                        return reject(err);
+                    }
+
+                    if(data.binPath){
+                        return resolve(data.binPath);
+                    }
+
+                    if(data.downloading){
+                        /**
+                         * @event GethConnector#DOWNLOADING_BINARY
+                         */
+                        this.emit(event.DOWNLOADING_BINARY);
+                    }
+                })
         });
     }
 
