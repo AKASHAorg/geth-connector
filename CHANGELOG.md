@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.6.9"></a>
+## [1.6.9](https://github.com/AkashaProject/geth-connector/compare/v1.6.8...v1.6.9) (2016-11-01)
+
+
+### Bug Fixes
+
+* **autowatch:** prevent loss of filter id ([0f15f3b](https://github.com/AkashaProject/geth-connector/commit/0f15f3b))
+
+
+
 <a name="1.6.8"></a>
 ## [1.6.8](https://github.com/AkashaProject/geth-connector/compare/v1.6.7...v1.6.8) (2016-10-20)
 
