@@ -57,6 +57,10 @@ export class GethHelper {
 
         const currentQueue: string[] = [];
         this.watching = true;
+        if(this.watcher) {
+            return Promise.resolve(this.watching);
+        }
+
         this.watcher = GethConnector.getInstance().web3.eth.filter('latest');
         this.watcher.watch((err: any, block: any) => {
             if (err) {
@@ -105,7 +109,7 @@ export class GethHelper {
      */
     public stopTxWatch() {
         this.watching = false;
-        return (this.watcher) ? this.watcher.stopWatching(()=> {}) : '';
+        return (this.watcher) ? this.watcher.stopWatching(()=> { this.watcher = null;}) : '';
     }
 
     /**
