@@ -7,18 +7,14 @@ import * as url from 'url';
 const defaultTarget = path.join(__dirname, 'bin');
 
 const repo = 'https://github.com/ethereum/go-ethereum/releases/download/';
-const gethVersion = 'v1.4.18/';
+const gethVersion = 'v1.5.0/';
 
 const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
-    linux: 'geth-linux-amd64-1.4.18-ef9265d0.tar.gz',
-    win: 'geth-windows-amd64-1.4.18-ef9265d0.zip',
-    osx: 'geth-darwin-amd64-1.4.18-ef9265d0.tar.gz'
-};
-
-const getDownloadUrl = (archive: string): string => {
-    return url.resolve(baseUrl, archive);
+    linux: baseUrl + 'geth-linux-amd64-1.5.0-c3c58eb6.tar.gz',
+    win: 'https://gethstore.blob.core.windows.net/builds/geth-windows-amd64-1.5.0-c3c58eb6.zip',
+    osx: baseUrl + 'geth-darwin-amd64-1.5.0-c3c58eb6.tar.gz'
 };
 
 export class GethBin {
@@ -29,9 +25,9 @@ export class GethBin {
      */
     constructor(target: string = defaultTarget) {
         this.wrapper = new Wrapper()
-            .src(getDownloadUrl(source.linux), 'linux', 'x64')
-            .src(getDownloadUrl(source.win), 'win32', 'x64')
-            .src(getDownloadUrl(source.osx), 'darwin', 'x64')
+            .src(source.linux, 'linux', 'x64')
+            .src(source.win, 'win32', 'x64')
+            .src(source.osx, 'darwin', 'x64')
             .dest(target)
             .use(process.platform === 'win32' ? 'geth.exe' : 'geth');
     }
