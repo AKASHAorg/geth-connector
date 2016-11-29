@@ -1,19 +1,19 @@
 /// <reference path="../typings/main.d.ts"/>
 import Wrapper = require('bin-wrapper');
 import * as path from 'path';
-import * as url from 'url';
+// import * as url from 'url';
 
 const defaultTarget = path.join(__dirname, 'bin');
 
  const repo = 'https://gethstore.blob.core.windows.net/builds/';
- const gethVersion = 'v1.5.2/';
+ const gethVersion = 'v1.5.4/';
 
 // const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
-    linux: repo + 'geth-linux-amd64-1.5.2-c8695209.tar.gz',
-    win: repo + 'geth-windows-amd64-1.5.2-c8695209.zip',
-    osx: repo + 'geth-ios-all-1.5.2-c8695209.tar.gz'
+    linux: repo + 'geth-linux-amd64-1.5.4-b70acf3c.tar.gz',
+    win: repo + 'geth-windows-amd64-1.5.4-b70acf3c.zip',
+    osx: repo + 'geth-darwin-amd64-1.5.4-b70acf3c.tar.gz'
 };
 
 export class GethBin {
