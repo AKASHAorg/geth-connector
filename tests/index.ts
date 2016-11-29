@@ -215,6 +215,10 @@ describe('GethConnector', function () {
         sinon.assert.calledOnce(spy);
     });
 
+    it('should remove executable', function () {
+        return GethConnector.getInstance().downloadManager.deleteBin()
+    });
+
     after(function (done) {
         rimraf(binPath, function () {
             GethConnector.getInstance().removeAllListeners(events.TX_MINED);

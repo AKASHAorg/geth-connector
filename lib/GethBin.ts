@@ -1,13 +1,15 @@
 /// <reference path="../typings/main.d.ts"/>
 import Wrapper = require('bin-wrapper');
 import * as path from 'path';
+import * as Promise from 'bluebird';
+import { unlink } from 'fs';
 // import * as url from 'url';
 
 const defaultTarget = path.join(__dirname, 'bin');
 
- const repo = 'https://gethstore.blob.core.windows.net/builds/';
- const gethVersion = 'v1.5.4/';
-
+const repo = 'https://gethstore.blob.core.windows.net/builds/';
+const gethVersion = 'v1.5.4/';
+const unlinkAsync = Promise.promisify(unlink);
 // const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
@@ -30,6 +32,7 @@ export class GethBin {
             .dest(target)
             .use(process.platform === 'win32' ? 'geth.exe' : 'geth');
     }
+
     /**
      * Required geth version for this app
      * @returns {string}
@@ -63,11 +66,18 @@ export class GethBin {
             }
             const response = { binPath: this.getPath() };
 
-            if(!downloading){
+            if (!downloading) {
                 return cb('', response);
             }
 
-            setTimeout(()=> cb('', response), 300);
+            setTimeout(() => cb('', response), 300);
         });
+    }
+
+    /**
+     * @returns {Bluebird<T>}
+     */
+    deleteBin() {
+        return unlinkAsync(this.getPath());
     }
 }
