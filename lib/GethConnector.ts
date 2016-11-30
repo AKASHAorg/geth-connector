@@ -165,7 +165,9 @@ export default class GethConnector extends EventEmitter {
                     .delete(event.INFO_FILTER);
             }
         }
-        this.socket.end();
+        if (this.socket) {
+            this.socket.end();
+        }
         this.socket = null;
         return true;
     }
