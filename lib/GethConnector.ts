@@ -141,7 +141,9 @@ export default class GethConnector extends EventEmitter {
     private _flushEvents() {
         this.web3.reset();
         this.serviceStatus.api = false;
-        this.socket.removeAllListeners();
+        if (this.socket) {
+            this.socket.removeAllListeners();
+        }
         if (!this.connectedToLocal) {
             if (this.watchers.get(event.START_FILTER)) {
                 this.gethService
@@ -298,8 +300,8 @@ export default class GethConnector extends EventEmitter {
     private _checkBin() {
         return new Promise((resolve, reject) => {
             this.downloadManager.check(
-                (err: Error, data:{binPath?: string, downloading?: boolean}) => {
-                    if(err){
+                (err: Error, data: {binPath?: string, downloading?: boolean}) => {
+                    if (err) {
                         this.logger.error(err);
                         /**
                          * @event GethConnector#BINARY_CORRUPTED
@@ -308,11 +310,11 @@ export default class GethConnector extends EventEmitter {
                         return reject(err);
                     }
 
-                    if(data.binPath){
+                    if (data.binPath) {
                         return resolve(data.binPath);
                     }
 
-                    if(data.downloading){
+                    if (data.downloading) {
                         /**
                          * @event GethConnector#DOWNLOADING_BINARY
                          */
