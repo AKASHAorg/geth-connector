@@ -520,7 +520,10 @@ export default class GethConnector extends EventEmitter {
                 message = `required geth version: ${requiredVersion}, found: ${buildVersion}, updating executable...`;
                 this.logger.warn(message);
                 this.emit(event.ERROR, message);
-                return this.downloadManager.deleteBin().then(() => this.restart())
+                return this.stop()
+                    .delay(1000)
+                    .then(() => this.downloadManager.deleteBin())
+                    .then(() => this.restart());
             }
             let netId = this.spawnOptions.get('networkid');
             if (this.spawnOptions.has('testnet')) {
