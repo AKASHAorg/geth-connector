@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.6.14"></a>
+## [1.6.14](https://github.com/AkashaProject/geth-connector/compare/v1.6.13...v1.6.14) (2016-11-30)
+
+
+### Bug Fixes
+
+* **update:** stop geth before updating executable ([ba00f77](https://github.com/AkashaProject/geth-connector/commit/ba00f77))
+
+
+
 <a name="1.6.13"></a>
 ## [1.6.13](https://github.com/AkashaProject/geth-connector/compare/v1.6.12...v1.6.13) (2016-11-29)
 
