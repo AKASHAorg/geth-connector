@@ -95,16 +95,15 @@ export default class GethConnector extends EventEmitter {
     /**
      * @fires GethConnector#STOPPING
      * @fires GethConnector#STOPPED
-     * @param signal
      * @returns {Bluebird<U>}
      */
-    public stop(signal?: string) {
+    public stop() {
         /**
          * @event GethConnector#STOPPING
          */
         this.emit(event.STOPPING);
         this._flushEvents();
-        const killProcess = (this.gethService) ? this.gethService.kill(signal) : true;
+        const killProcess = (this.gethService) ? this.gethService.kill() : true;
         return Promise.resolve(killProcess)
             .then(() => {
                 /**
@@ -238,7 +237,7 @@ export default class GethConnector extends EventEmitter {
                 const dataDir = (this.spawnOptions.get('datadir')) ? this.spawnOptions.get('datadir') : GethConnector.getDefaultDatadir();
                 let command = `--datadir="${dataDir}"`;
                 command += ` init ${genesisPath}`;
-                exec(`${binPath} ${command}`, (error, stdout) => {
+                exec(`"${binPath}" ${command}`, (error, stdout) => {
                     cb(error, stdout);
                 });
             }
@@ -525,7 +524,7 @@ export default class GethConnector extends EventEmitter {
                 this.logger.warn(message);
                 this.emit(event.ERROR, message);
                 return this.stop()
-                    .delay(1000)
+                    .delay(3500)
                     .then(() => this.downloadManager.deleteBin())
                     .then(() => this.restart());
             }

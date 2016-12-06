@@ -62,6 +62,7 @@ export class GethBin {
         this.wrapper.run(['version'], (err: any) => {
             clearTimeout(timeOut);
             if (err) {
+                setTimeout(this.deleteBin, 2000);
                 return cb(err);
             }
             const response = { binPath: this.getPath() };
