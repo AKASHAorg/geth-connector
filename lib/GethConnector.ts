@@ -236,7 +236,7 @@ export default class GethConnector extends EventEmitter {
             if (binPath) {
                 const dataDir = (this.spawnOptions.get('datadir')) ? this.spawnOptions.get('datadir') : GethConnector.getDefaultDatadir();
                 let command = `--datadir="${dataDir}"`;
-                command += ` init ${genesisPath}`;
+                command += ` init "${genesisPath}"`;
                 exec(`"${binPath}" ${command}`, (error, stdout) => {
                     cb(error, stdout);
                 });
