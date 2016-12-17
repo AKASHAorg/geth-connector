@@ -438,15 +438,10 @@ export default class GethConnector extends EventEmitter {
                 this.serviceStatus.process = true;
                 this._connectToIPC();
                 clearTimeout(timeout);
-            }
-            if (log.includes('mapped network ')) {
-                if (!started) {
-                    /**
-                     * @event GethConnector#STARTED
-                     */
-                    setTimeout(() => this.emit(event.STARTED), 2000);
-                }
-                started = true;
+                /**
+                 * @event GethConnector#STARTED
+                 */
+                setTimeout(() => this.emit(event.STARTED), 5000);
             }
             this.logger.info(log);
         };
