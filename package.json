@@ -35,9 +35,9 @@
     "@types/chai": "3.4.34",
     "@types/debug": "0.0.29",
     "@types/mocha": "2.2.33",
-    "@types/node": "6.0.48",
+    "@types/node": "6.0.52",
     "@types/rimraf": "0.0.28",
-    "@types/sinon": "1.16.32",
+    "@types/sinon": "1.16.33",
     "bin-wrapper": "3.0.2",
     "bluebird": "3.4.6",
     "web3": "0.17.0-beta"
@@ -45,15 +45,15 @@
   "devDependencies": {
     "chai": "3.5.0",
     "coveralls": "2.11.15",
-    "ethereumjs-testrpc": "3.0.2",
+    "ethereumjs-testrpc": "3.0.3",
     "istanbul": "0.4.5",
     "mocha": "3.2.0",
     "mocha-lcov-reporter": "1.2.0",
     "rimraf": "2.5.4",
     "sinon": "1.17.6",
-    "standard-version": "3.0.0",
-    "tslint": "4.0.2",
-    "typescript": "2.0.10"
+    "standard-version": "4.0.0",
+    "tslint": "4.1.1",
+    "typescript": "2.1.4"
   },
   "directories": {
     "test": "tests"
