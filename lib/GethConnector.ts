@@ -308,6 +308,7 @@ export default class GethConnector extends EventEmitter {
                          * @event GethConnector#BINARY_CORRUPTED
                          */
                         this.emit(event.BINARY_CORRUPTED, err);
+                        this.downloadManager.deleteBin();
                         return reject(err);
                     }
 
