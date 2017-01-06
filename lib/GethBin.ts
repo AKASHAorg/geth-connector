@@ -8,14 +8,14 @@ import { unlink } from 'fs';
 const defaultTarget = path.join(__dirname, 'bin');
 
 const repo = 'https://gethstore.blob.core.windows.net/builds/';
-const gethVersion = 'v1.5.4/';
+const gethVersion = 'v1.5.5/';
 const unlinkAsync = Promise.promisify(unlink);
 // const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
-    linux: repo + 'geth-linux-amd64-1.5.4-b70acf3c.tar.gz',
-    win: repo + 'geth-windows-amd64-1.5.4-b70acf3c.zip',
-    osx: repo + 'geth-darwin-amd64-1.5.4-b70acf3c.tar.gz'
+    linux: repo + 'geth-linux-amd64-1.5.5-ff07d548.tar.gz',
+    win: repo + 'geth-windows-amd64-1.5.5-ff07d548.zip',
+    osx: repo + 'geth-darwin-amd64-1.5.5-ff07d548.tar.gz'
 };
 
 export class GethBin {

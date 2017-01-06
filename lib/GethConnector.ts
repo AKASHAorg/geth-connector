@@ -246,10 +246,10 @@ export default class GethConnector extends EventEmitter {
 
     /**
      * Get geth default datadir path
-     * @returns {String}
+     * @returns {string}
      */
     static getDefaultDatadir() {
-        let dataDir: String;
+        let dataDir: string;
         switch (platform) {
             case 'Linux':
                 dataDir = pathJoin(homedir(), '.ethereum');
@@ -268,11 +268,11 @@ export default class GethConnector extends EventEmitter {
 
     /**
      * Path for web3 ipc provider
-     * @returns {String}
+     * @returns {string}
      */
     static getDefaultIpcPath() {
         const dataDirPath = GethConnector.getDefaultDatadir();
-        let ipcPath: String;
+        let ipcPath: string;
         switch (platform) {
             case 'Windows_NT':
                 ipcPath = '\\\\.\\pipe\\geth.ipc';
