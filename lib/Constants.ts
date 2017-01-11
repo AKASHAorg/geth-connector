@@ -12,6 +12,7 @@ export const IPC_CONNECTED = 'GETH_IPC_CONNECTED';
 export const IPC_DISCONNECTED = 'GETH_IPC_DISCONNECTED';
 export const ETH_NODE_OK = 'ETH_NODE_OK';
 export const TX_MINED = 'TX_MINED';
+export const UPDATING_BINARY = 'UPDATING_BINARY';
 
 export const START_OPTIONS = {cache: 512, fast: ''};
 export const BIN_PATH = 'binPath';

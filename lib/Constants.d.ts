@@ -12,6 +12,7 @@ export declare const IPC_CONNECTED: string;
 export declare const IPC_DISCONNECTED: string;
 export declare const ETH_NODE_OK: string;
 export declare const TX_MINED: string;
+export declare const UPDATING_BINARY: string;
 export declare const START_OPTIONS: {
     cache: number;
     fast: string;

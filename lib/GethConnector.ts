@@ -518,7 +518,7 @@ export default class GethConnector extends EventEmitter {
             if (!buildVersion.includes(requiredVersion)) {
                 message = `required geth version: ${requiredVersion}, found: ${buildVersion}, updating executable...`;
                 this.logger.warn(message);
-                this.emit(event.ERROR, message);
+                this.emit(event.UPDATING_BINARY, message);
                 return this.stop()
                     .delay(3500)
                     .then(() => this.downloadManager.deleteBin())

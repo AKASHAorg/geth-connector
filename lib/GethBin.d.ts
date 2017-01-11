@@ -6,5 +6,6 @@ export declare class GethBin {
     constructor(target?: string);
     static requiredVersion(): string;
     getPath(): any;
-    check(): Promise<{}>;
+    check(cb: any): void;
+    deleteBin(): Promise<{}>;
 }
