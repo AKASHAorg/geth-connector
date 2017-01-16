@@ -35,12 +35,12 @@
     "@types/chai": "3.4.34",
     "@types/debug": "0.0.29",
     "@types/mocha": "2.2.37",
-    "@types/node": "6.0.59",
+    "@types/node": "7.0.0",
     "@types/rimraf": "0.0.28",
     "@types/sinon": "1.16.34",
     "bin-wrapper": "3.0.2",
     "bluebird": "3.4.7",
-    "web3": "0.18.0"
+    "web3": "0.18.2"
   },
   "devDependencies": {
     "chai": "3.5.0",
@@ -53,7 +53,7 @@
     "sinon": "1.17.7",
     "standard-version": "4.0.0",
     "tslint": "4.3.1",
-    "typescript": "2.1.4"
+    "typescript": "2.1.5"
   },
   "directories": {
     "test": "tests"
