@@ -1,6 +1,6 @@
 {
   "name": "@akashaproject/geth-connector",
-  "version": "1.6.27",
+  "version": "1.6.28",
   "description": "Package used by AKASHA to manage geth/web3",
   "main": "index.js",
   "types": "index.d.ts",
@@ -32,28 +32,28 @@
   "homepage": "https://github.com/AkashaProject/geth-connector#readme",
   "dependencies": {
     "@types/bluebird": "3.0.37",
-    "@types/chai": "3.4.34",
+    "@types/chai": "3.4.35",
     "@types/debug": "0.0.29",
-    "@types/mocha": "2.2.38",
-    "@types/node": "7.0.4",
+    "@types/mocha": "2.2.39",
+    "@types/node": "7.0.5",
     "@types/rimraf": "0.0.28",
-    "@types/sinon": "1.16.34",
+    "@types/sinon": "1.16.35",
     "bin-wrapper": "3.0.2",
     "bluebird": "3.4.7",
     "web3": "0.18.2"
   },
   "devDependencies": {
     "chai": "3.5.0",
-    "coveralls": "2.11.15",
+    "coveralls": "2.11.16",
     "ethereumjs-testrpc": "3.0.3",
     "istanbul": "0.4.5",
     "mocha": "3.2.0",
     "mocha-lcov-reporter": "1.2.0",
-    "rimraf": "2.5.4",
+    "rimraf": "2.6.0",
     "sinon": "1.17.7",
     "standard-version": "4.0.0",
     "tslint": "4.4.2",
-    "typescript": "2.1.5"
+    "typescript": "2.1.6"
   },
   "directories": {
     "test": "tests"
