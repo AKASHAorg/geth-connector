@@ -8,14 +8,15 @@ import { unlink } from 'fs';
 const defaultTarget = path.join(__dirname, 'bin');
 
 const repo = 'https://gethstore.blob.core.windows.net/builds/';
-const gethVersion = 'v1.5.8/';
+const gethVersion = '1.5.9';
+const gethCommit = 'a07539fb';
 const unlinkAsync = Promise.promisify(unlink);
 // const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
-    linux: repo + 'geth-linux-amd64-1.5.8-f58fb322.tar.gz',
-    win: repo + 'geth-windows-amd64-1.5.8-f58fb322.zip',
-    osx: repo + 'geth-darwin-amd64-1.5.8-f58fb322.tar.gz'
+    linux: `${repo}geth-linux-amd64-${gethVersion}-${gethCommit}.tar.gz`,
+    win: `${repo}geth-windows-amd64-${gethVersion}-${gethCommit}.zip`,
+    osx: `${repo}geth-darwin-amd64-${gethVersion}-${gethCommit}.tar.gz`
 };
 
 export class GethBin {
@@ -38,7 +39,7 @@ export class GethBin {
      * @returns {string}
      */
     static requiredVersion() {
-        return gethVersion.slice(0, -1);
+        return `v${gethVersion}`;
     }
 
     /**

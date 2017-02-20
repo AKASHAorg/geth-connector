@@ -1,5 +1,4 @@
 /// <reference types="node" />
-/// <reference types="chai" />
 /// <reference types="bluebird" />
 import { GethBin } from './GethBin';
 import { Web3 } from './Web3';

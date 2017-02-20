@@ -1,5 +1,4 @@
 /// <reference types="bluebird" />
-/// <reference types="node" />
 import * as Promise from 'bluebird';
 export declare class GethHelper {
     watcher: any;
