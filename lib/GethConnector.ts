@@ -21,6 +21,7 @@ export default class GethConnector extends EventEmitter {
     public serviceStatus: { process: boolean, api: boolean } = { process: false, api: false };
     private socket: Socket;
     private connectedToLocal: boolean = false;
+    private isLight = false;
     public watchers = new Map();
 
     /**
@@ -187,6 +188,10 @@ export default class GethConnector extends EventEmitter {
             if (platform !== 'Windows_NT' && options.hasOwnProperty('datadir') && !options.hasOwnProperty('ipcpath')) {
                 options.ipcpath = pathJoin(options.datadir, 'geth.ipc');
             }
+
+            if(options.hasOwnProperty('light')){
+                this.isLight = true;
+            }
         }
 
         if (this.spawnOptions.size) {
@@ -236,6 +241,7 @@ export default class GethConnector extends EventEmitter {
             if (binPath) {
                 const dataDir = (this.spawnOptions.get('datadir')) ? this.spawnOptions.get('datadir') : GethConnector.getDefaultDatadir();
                 let command = `--datadir="${dataDir}"`;
+                command += (this.isLight)? ' --light': '';
                 command += ` init "${genesisPath}"`;
                 exec(`"${binPath}" ${command}`, (error, stdout) => {
                     cb(error, stdout);

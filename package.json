@@ -35,7 +35,7 @@
     "@types/chai": "3.4.35",
     "@types/debug": "0.0.29",
     "@types/mocha": "2.2.39",
-    "@types/node": "7.0.5",
+    "@types/node": "7.0.7",
     "@types/rimraf": "0.0.28",
     "@types/sinon": "1.16.35",
     "bin-wrapper": "3.0.2",
