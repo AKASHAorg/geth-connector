@@ -19,8 +19,7 @@ export class GethHelper {
 
         const rules = [
             GethConnector.getInstance().web3.eth.getSyncingAsync(),
-            GethConnector.getInstance().web3.net.getPeerCountAsync(),
-            GethConnector.getInstance().web3.eth.getBlockAsync('latest')
+            GethConnector.getInstance().web3.net.getPeerCountAsync()
         ];
 
         return Promise.all(rules).then((data) => {
@@ -29,9 +28,18 @@ export class GethHelper {
                 return [data[1], data[0]];
             }
 
-            if (!data[0] && data[1] > 0 && (data[2].timestamp + 60 * 2) > timeStamp) {
-                this.syncing = false;
-                return [];
+            if (!data[0] && data[1] > 0) {
+                return GethConnector.getInstance()
+                    .web3
+                    .eth
+                    .getBlockAsync('latest')
+                    .then((latestBlock: any): any => {
+                        if ((latestBlock.timestamp + 60 * 2) > timeStamp) {
+                            this.syncing = false;
+                            return [];
+                        }
+                        return [data[1]];
+                    });
             }
 
             return [data[1]];
@@ -57,7 +65,7 @@ export class GethHelper {
 
         const currentQueue: string[] = [];
         this.watching = true;
-        if(this.watcher) {
+        if (this.watcher) {
             return Promise.resolve(this.watching);
         }
 
@@ -109,7 +117,9 @@ export class GethHelper {
      */
     public stopTxWatch() {
         this.watching = false;
-        return (this.watcher) ? this.watcher.stopWatching(()=> { this.watcher = null;}) : '';
+        return (this.watcher) ? this.watcher.stopWatching(() => {
+                this.watcher = null;
+            }) : '';
     }
 
     /**
