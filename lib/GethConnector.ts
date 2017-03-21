@@ -18,7 +18,7 @@ export default class GethConnector extends EventEmitter {
     public logger: any = console;
     public spawnOptions = new Map();
     public gethService: ChildProcess;
-    public serviceStatus: { process: boolean, api: boolean } = { process: false, api: false };
+    public serviceStatus: { process: boolean, api: boolean, version: string } = { process: false, api: false, version: '' };
     private socket: Socket;
     private connectedToLocal: boolean = false;
     private isLight = false;
@@ -521,6 +521,7 @@ export default class GethConnector extends EventEmitter {
         return Promise.all(runningServiceProps).then(([buildVersion, networkId]) => {
             let message: string;
             networkId = parseInt(networkId, 10);
+            this.serviceStatus.version = buildVersion;
             if (!buildVersion.includes(requiredVersion)) {
                 message = `required geth version: ${requiredVersion}, found: ${buildVersion}, updating executable...`;
                 this.logger.warn(message);
