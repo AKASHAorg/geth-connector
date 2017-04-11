@@ -19,9 +19,9 @@ const cpuPriority = {
         [event.PriorityCode.LOW]: '17'
     },
     win: {
-        [event.PriorityCode.HIGH]: '/high',
-        [event.PriorityCode.NORMAL]: '/normal',
-        [event.PriorityCode.LOW]: '/belownormal'
+        [event.PriorityCode.HIGH]: 'high',
+        [event.PriorityCode.NORMAL]: 'normal',
+        [event.PriorityCode.LOW]: 'below normal'
     }
 };
 
@@ -103,21 +103,13 @@ export default class GethConnector extends EventEmitter {
             if (this.connectedToLocal) {
                 return false;
             }
-            let command, spawnOptions;
 
-            if (process.platform !== 'win32') {
-                command = 'nice';
-                spawnOptions = ['-n', cpuPriority.unix[this.cpuPriority], binPath].concat(this._flattenOptions());
-            } else {
-                command = 'start';
-                spawnOptions = ['/b', cpuPriority.win[this.cpuPriority], binPath].concat(this._flattenOptions());
-            }
-
-            this.gethService = spawn(command, spawnOptions, { detached: true });
+            this.gethService = spawn(binPath, this._flattenOptions(), { detached: true });
             return true;
         }).then((passed: boolean) => {
             if (passed) {
                 this._attachEvents();
+                this.executeCpuPriority();
             }
             return passed;
         });
@@ -164,12 +156,35 @@ export default class GethConnector extends EventEmitter {
         this.connectedToLocal = true;
     }
 
-    public setCpuPriority(level: event.PriorityCode) {
+    public setCpuPriority(level: event.PriorityCode, immediate?: boolean) {
         if (!event.PriorityCode.hasOwnProperty(level)) {
             throw new Error('Invalid priority level');
         }
         this.cpuPriority = level;
+        if (immediate) {
+            this.executeCpuPriority();
+        }
     }
+
+    public executeCpuPriority() {
+        if (!this.gethService.pid) {
+            this.logger.warn('cpu:geth process is not started');
+            return;
+        }
+
+        const command = (process.platform === 'win32') ?
+            `wmic process where name="geth.exe" CALL setpriority "${cpuPriority.win[this.cpuPriority]}"` :
+            `renice -n ${cpuPriority.unix[this.cpuPriority]} -p ${this.gethService.pid}`;
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                this.logger.error(`cpu:geth:exec error: ${error}`);
+                return;
+            }
+            this.logger.info(`cpu:geth:stdout: ${stdout}`);
+            this.logger.info(`cpu:geth:stderr: ${stderr}`);
+        });
+    }
+
     public getCpuPriority() {
         return this.cpuPriority;
     }
