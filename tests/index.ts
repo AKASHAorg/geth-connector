@@ -63,6 +63,9 @@ describe('GethConnector', function () {
 
     it('should #start geth process', function (done) {
         const spy = sinon.spy();
+        GethConnector.getInstance().setCpuPriority(events.PriorityCode.HIGH);
+        expect(GethConnector.getInstance().getCpuPriority()).to.equal(events.PriorityCode.HIGH);
+
         GethConnector.getInstance().once(events.STARTING, spy);
         GethConnector.getInstance().once(events.IPC_CONNECTED, function () {
             done();
@@ -74,7 +77,8 @@ describe('GethConnector', function () {
         GethConnector.getInstance().once(events.FAILED, function (reason: string) {
             throw new Error(`could not start geth #FAILED ${reason}`);
         });
-        GethConnector.getInstance().start();
+        GethConnector.getInstance().start({cpu: events.PriorityCode.NORMAL});
+        expect(GethConnector.getInstance().getCpuPriority()).to.equal(events.PriorityCode.NORMAL);
         sinon.assert.calledOnce(spy);
     });
 

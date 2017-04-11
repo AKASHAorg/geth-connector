@@ -18,3 +18,9 @@ export const START_OPTIONS = {cache: 512, fast: ''};
 export const BIN_PATH = 'binPath';
 export const START_FILTER = 'START_FILTER';
 export const INFO_FILTER = 'INFO_FILTER';
+
+export enum PriorityCode {
+    LOW, //0
+    NORMAL, //1
+    HIGH //2
+}

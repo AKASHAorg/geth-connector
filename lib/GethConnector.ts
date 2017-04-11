@@ -12,22 +12,41 @@ const platform = osType();
 const symbolEnforcer = Symbol();
 const symbol = Symbol();
 
+const cpuPriority = {
+    unix: {
+        [event.PriorityCode.HIGH]: '-17',
+        [event.PriorityCode.NORMAL]: '0',
+        [event.PriorityCode.LOW]: '17'
+    },
+    win: {
+        [event.PriorityCode.HIGH]: '/high',
+        [event.PriorityCode.NORMAL]: '/normal',
+        [event.PriorityCode.LOW]: '/belownormal'
+    }
+};
+
 export default class GethConnector extends EventEmitter {
     public downloadManager = new GethBin();
     public ipcStream = new Web3();
     public logger: any = console;
     public spawnOptions = new Map();
     public gethService: ChildProcess;
-    public serviceStatus: { process: boolean, api: boolean, version: string } = { process: false, api: false, version: '' };
+    public serviceStatus: { process: boolean, api: boolean, version: string } = {
+        process: false,
+        api: false,
+        version: ''
+    };
     private socket: Socket;
     private connectedToLocal: boolean = false;
     private isLight = false;
+
+    private cpuPriority = event.PriorityCode.LOW;
     public watchers = new Map();
 
     /**
      * @param enforcer
      */
-    constructor(enforcer: Symbol) {
+    constructor(enforcer: symbol) {
         super();
         if (enforcer !== symbolEnforcer) {
             throw new Error('Use .getInstance() instead of new constructor');
@@ -64,11 +83,12 @@ export default class GethConnector extends EventEmitter {
      * @fires GethConnector#STARTING
      * @param options
      */
-    public start(options?: Object) {
+    public start(options?: any) {
         /**
          * @event GethConnector#STARTING
          */
         this.emit(event.STARTING);
+
         this.setOptions(options);
         this.socket = new Socket();
         return this._checkBin().then((binPath: string) => {
@@ -83,7 +103,17 @@ export default class GethConnector extends EventEmitter {
             if (this.connectedToLocal) {
                 return false;
             }
-            this.gethService = spawn(binPath, this._flattenOptions(), { detached: true });
+            let command, spawnOptions;
+
+            if (process.platform !== 'win32') {
+                command = 'nice';
+                spawnOptions = ['-n', cpuPriority.unix[this.cpuPriority], binPath].concat(this._flattenOptions());
+            } else {
+                command = 'start';
+                spawnOptions = ['/b', cpuPriority.win[this.cpuPriority], binPath].concat(this._flattenOptions());
+            }
+
+            this.gethService = spawn(command, spawnOptions, { detached: true });
             return true;
         }).then((passed: boolean) => {
             if (passed) {
@@ -134,6 +164,16 @@ export default class GethConnector extends EventEmitter {
         this.connectedToLocal = true;
     }
 
+    public setCpuPriority(level: event.PriorityCode) {
+        if (!event.PriorityCode.hasOwnProperty(level)) {
+            throw new Error('Invalid priority level');
+        }
+        this.cpuPriority = level;
+    }
+    public getCpuPriority() {
+        return this.cpuPriority;
+    }
+
     /**
      * Remove web3 and logging listeners
      * @private
@@ -181,6 +221,11 @@ export default class GethConnector extends EventEmitter {
     public setOptions(options?: any) {
         let localOptions: Object;
         if (options) {
+            if (options.hasOwnProperty('cpu')) {
+                this.setCpuPriority(options.cpu);
+                delete options.cpu;
+            }
+
             if (platform === 'Windows_NT' && options.hasOwnProperty('ipcpath')) {
                 options.ipcpath = pathJoin('\\\\.\\pipe', options.ipcpath);
             }
@@ -189,7 +234,7 @@ export default class GethConnector extends EventEmitter {
                 options.ipcpath = pathJoin(options.datadir, 'geth.ipc');
             }
 
-            if(options.hasOwnProperty('light')){
+            if (options.hasOwnProperty('light')) {
                 this.isLight = true;
             }
         }
@@ -241,7 +286,7 @@ export default class GethConnector extends EventEmitter {
             if (binPath) {
                 const dataDir = (this.spawnOptions.get('datadir')) ? this.spawnOptions.get('datadir') : GethConnector.getDefaultDatadir();
                 let command = `--datadir="${dataDir}"`;
-                command += (this.isLight)? ' --light': '';
+                command += (this.isLight) ? ' --light' : '';
                 command += ` init "${genesisPath}"`;
                 exec(`"${binPath}" ${command}`, (error, stdout) => {
                     cb(error, stdout);
@@ -307,7 +352,7 @@ export default class GethConnector extends EventEmitter {
     private _checkBin() {
         return new Promise((resolve, reject) => {
             this.downloadManager.check(
-                (err: Error, data: {binPath?: string, downloading?: boolean}) => {
+                (err: Error, data: { binPath?: string, downloading?: boolean }) => {
                     if (err) {
                         this.logger.error(err);
                         /**
