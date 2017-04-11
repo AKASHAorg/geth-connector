@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.7.0"></a>
+# [1.7.0](https://github.com/AkashaProject/geth-connector/compare/v1.6.33...v1.7.0) (2017-04-11)
+
+
+### Features
+
+* add cpu priority option ([705e883](https://github.com/AkashaProject/geth-connector/commit/705e883))
+
+
+
 <a name="1.6.33"></a>
 ## [1.6.33](https://github.com/AkashaProject/geth-connector/compare/v1.6.32...v1.6.33) (2017-03-31)
 
