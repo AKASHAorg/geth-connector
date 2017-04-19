@@ -175,6 +175,7 @@ export default class GethConnector extends EventEmitter {
         const command = (process.platform === 'win32') ?
             `wmic process where name="geth.exe" CALL setpriority "${cpuPriority.win[this.cpuPriority]}"` :
             `renice -n ${cpuPriority.unix[this.cpuPriority]} -p ${this.gethService.pid}`;
+
         exec(command, (error, stdout, stderr) => {
             if (error) {
                 this.logger.error(`cpu:geth:exec error: ${error}`);
