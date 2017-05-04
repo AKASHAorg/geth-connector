@@ -42,3 +42,5 @@ bin
 lib/*.js
 tests/index.js
 index.js
+*.js
+*.d.ts
