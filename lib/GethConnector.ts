@@ -1,12 +1,12 @@
-import { GethBin } from './GethBin';
-import { Web3 } from './Web3';
-import { Socket } from 'net';
-import * as event from './Constants';
-import { EventEmitter } from 'events';
-import { spawn, ChildProcess, exec } from 'child_process';
-import * as Promise from 'bluebird';
-import { type as osType, homedir } from 'os';
-import { join as pathJoin } from 'path';
+import { GethBin } from "./GethBin";
+import { Web3 } from "./Web3";
+import { Socket } from "net";
+import * as event from "./Constants";
+import { EventEmitter } from "events";
+import { ChildProcess, exec, spawn } from "child_process";
+import * as Promise from "bluebird";
+import { homedir, type as osType } from "os";
+import { join as pathJoin } from "path";
 
 const platform = osType();
 const symbolEnforcer = Symbol();
@@ -504,12 +504,8 @@ export default class GethConnector extends EventEmitter {
             }
             if (log.includes('IPC endpoint opened')) {
                 this.serviceStatus.process = true;
-                this._connectToIPC();
                 clearTimeout(timeout);
-                /**
-                 * @event GethConnector#STARTED
-                 */
-                setTimeout(() => this.emit(event.STARTED), 5000);
+                this._connectToIPC();
             }
             this.logger.info(log);
         };
@@ -545,6 +541,10 @@ export default class GethConnector extends EventEmitter {
                 (status: boolean) => {
                     if (status) {
                         this.serviceStatus.api = true;
+                        /**
+                         * @event GethConnector#STARTED
+                         */
+                        this.emit(event.STARTED);
                     }
                 }
             );
