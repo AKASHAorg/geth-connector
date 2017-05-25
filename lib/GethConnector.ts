@@ -126,14 +126,14 @@ export default class GethConnector extends EventEmitter {
          */
         this.emit(event.STOPPING);
         this._flushEvents();
+        if (!this.gethService) {
+            /**
+             * @event GethConnector#STOPPED
+             */
+            this.emit(event.STOPPED);
+        }
         const killProcess = (this.gethService) ? this.gethService.kill() : true;
-        return Promise.delay(500)
-            .then(() => {
-                /**
-                 * @event GethConnector#STOPPED
-                 */
-                this.emit(event.STOPPED);
-            });
+        return Promise.delay(500);
 
     }
 
@@ -540,21 +540,21 @@ export default class GethConnector extends EventEmitter {
         this.ipcStream.setProvider(this.spawnOptions.get('ipcpath'), this.socket);
         this.socket.once('connect', () => {
             this.logger.info('connection to ipc Established!');
-            this._checkRunningSevice().then(
-                (status: boolean) => {
-                    if (status) {
-                        this.serviceStatus.api = true;
-                        /**
-                         * @event GethConnector#STARTED
-                         */
-                        this.emit(event.STARTED);
-                    }
-                }
-            );
             /**
              * @event GethConnector#IPC_CONNECTED
              */
             this.emit(event.IPC_CONNECTED);
+            this._checkRunningSevice().then(
+                (status: boolean) => {
+                    if (status) {
+                        this.serviceStatus.api = true;
+                    }
+                }
+            );
+            /**
+             * @event GethConnector#STARTED
+             */
+            this.emit(event.STARTED);
         });
         this.socket.once('error', (error: any) => {
             this.web3.reset();
