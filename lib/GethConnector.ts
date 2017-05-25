@@ -1,12 +1,12 @@
-import { GethBin } from "./GethBin";
-import { Web3 } from "./Web3";
-import { Socket } from "net";
-import * as event from "./Constants";
-import { EventEmitter } from "events";
-import { ChildProcess, exec, spawn } from "child_process";
-import * as Promise from "bluebird";
-import { homedir, type as osType } from "os";
-import { join as pathJoin } from "path";
+import { GethBin } from './GethBin';
+import { Web3 } from './Web3';
+import { Socket } from 'net';
+import * as event from './Constants';
+import { EventEmitter } from 'events';
+import { ChildProcess, exec, spawn } from 'child_process';
+import * as Promise from 'bluebird';
+import { homedir, type as osType } from 'os';
+import { join as pathJoin } from 'path';
 
 const platform = osType();
 const symbolEnforcer = Symbol();
@@ -127,7 +127,7 @@ export default class GethConnector extends EventEmitter {
         this.emit(event.STOPPING);
         this._flushEvents();
         const killProcess = (this.gethService) ? this.gethService.kill() : true;
-        return Promise.resolve(killProcess)
+        return Promise.delay(500)
             .then(() => {
                 /**
                  * @event GethConnector#STOPPED
@@ -197,6 +197,8 @@ export default class GethConnector extends EventEmitter {
     private _flushEvents() {
         this.web3.reset();
         this.serviceStatus.api = false;
+        this.serviceStatus.process = false;
+        this.serviceStatus.version = '';
         if (this.socket) {
             this.socket.removeAllListeners();
         }
@@ -389,7 +391,7 @@ export default class GethConnector extends EventEmitter {
                          */
                         this.emit(event.DOWNLOADING_BINARY);
                     }
-                })
+                });
         });
     }
 
@@ -431,6 +433,7 @@ export default class GethConnector extends EventEmitter {
                 message = `geth: received signal: ${signal}`;
                 this.logger.info(message);
             }
+            this._flushEvents();
             this.serviceStatus.process = false;
         });
 
@@ -588,9 +591,9 @@ export default class GethConnector extends EventEmitter {
                 this.logger.warn(message);
                 this.emit(event.UPDATING_BINARY, message);
                 return this.stop()
-                    .delay(3500)
+                    .delay(5000)
                     .then(() => this.downloadManager.deleteBin())
-                    .then(() => this.restart());
+                    .then(() => this.start());
             }
             let netId = this.spawnOptions.get('networkid');
             if (this.spawnOptions.has('testnet')) {

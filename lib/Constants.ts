@@ -20,7 +20,7 @@ export const START_FILTER = 'START_FILTER';
 export const INFO_FILTER = 'INFO_FILTER';
 
 export enum PriorityCode {
-    LOW = 1, //1
-    NORMAL, //2
-    HIGH //3
+    LOW = 1, // 1
+    NORMAL, // 2
+    HIGH // 3
 }
