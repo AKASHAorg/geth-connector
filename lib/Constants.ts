@@ -14,7 +14,7 @@ export const ETH_NODE_OK = 'ETH_NODE_OK';
 export const TX_MINED = 'TX_MINED';
 export const UPDATING_BINARY = 'UPDATING_BINARY';
 
-export const START_OPTIONS = {cache: 512, syncmode: 'fast'};
+export const START_OPTIONS = {cache: 512};
 export const BIN_PATH = 'binPath';
 export const START_FILTER = 'START_FILTER';
 export const INFO_FILTER = 'INFO_FILTER';
