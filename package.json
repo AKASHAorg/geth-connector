@@ -31,16 +31,16 @@
   },
   "homepage": "https://github.com/AkashaProject/geth-connector#readme",
   "dependencies": {
-    "@types/bluebird": "3.5.6",
-    "@types/chai": "4.0.0",
+    "@types/bluebird": "3.5.7",
+    "@types/chai": "4.0.1",
     "@types/debug": "0.0.29",
     "@types/mocha": "2.2.41",
-    "@types/node": "8.0.1",
+    "@types/node": "8.0.2",
     "@types/rimraf": "0.0.28",
     "@types/sinon": "2.3.1",
     "bin-wrapper": "3.0.2",
     "bluebird": "3.5.0",
-    "web3": "0.19.0"
+    "web3": "0.19.1"
   },
   "devDependencies": {
     "chai": "4.0.2",
