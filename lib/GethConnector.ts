@@ -38,7 +38,6 @@ export default class GethConnector extends EventEmitter {
     };
     private socket: Socket;
     private connectedToLocal: boolean = false;
-    private isLight = false;
 
     private cpuPriority = event.PriorityCode.LOW;
     public watchers = new Map();
@@ -251,13 +250,6 @@ export default class GethConnector extends EventEmitter {
             if (platform !== 'Windows_NT' && options.hasOwnProperty('datadir') && !options.hasOwnProperty('ipcpath')) {
                 options.ipcpath = pathJoin(options.datadir, 'geth.ipc');
             }
-
-            if (options.hasOwnProperty('syncmode') && options.syncmode === 'light') {
-                this.isLight = true;
-                if (options.hasOwnProperty('datadir')) {
-                    options.datadir = pathJoin(options.datadir, 'lightData');
-                }
-            }
         }
 
         if (this.spawnOptions.size) {
@@ -306,8 +298,7 @@ export default class GethConnector extends EventEmitter {
         this._checkBin().then((binPath: string) => {
             if (binPath) {
                 const dataDir = (this.spawnOptions.get('datadir')) ? this.spawnOptions.get('datadir') : '';
-                let command = (dataDir) ? `--datadir="${dataDir}"` : '';
-                command += (this.isLight) ? ` --syncmode="light"` : '';
+                let command = (dataDir) ? `--datadir "${dataDir}"` : '';
                 command += ` init "${genesisPath}"`;
                 exec(`"${binPath}" ${command}`, (error, stdout) => {
                     cb(error, stdout);
