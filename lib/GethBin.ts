@@ -10,7 +10,6 @@ const defaultTarget = path.join(__dirname, 'bin');
 const repo = 'https://gethstore.blob.core.windows.net/builds/';
 const gethVersion = '1.6.7';
 const gethCommit = 'ab5646c5';
-const unlinkAsync = Promise.promisify(unlink);
 // const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
@@ -80,6 +79,6 @@ export class GethBin {
      */
     deleteBin() {
         const path = this.getPath();
-        return unlinkAsync(path);
+        return Promise.fromCallback((cb) => unlink(path, cb));
     }
 }

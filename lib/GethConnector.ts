@@ -252,8 +252,11 @@ export default class GethConnector extends EventEmitter {
                 options.ipcpath = pathJoin(options.datadir, 'geth.ipc');
             }
 
-            if (options.hasOwnProperty('light')) {
+            if (options.hasOwnProperty('syncmode') && options.syncmode === 'light') {
                 this.isLight = true;
+                if (options.hasOwnProperty('datadir')) {
+                    options.datadir = pathJoin(options.datadir, 'lightData');
+                }
             }
         }
 
@@ -302,9 +305,9 @@ export default class GethConnector extends EventEmitter {
     writeGenesis(genesisPath: string, cb: any) {
         this._checkBin().then((binPath: string) => {
             if (binPath) {
-                const dataDir = (this.spawnOptions.get('datadir')) ? this.spawnOptions.get('datadir') : GethConnector.getDefaultDatadir();
-                let command = `--datadir="${dataDir}"`;
-                command += (this.isLight) ? ' --light' : '';
+                const dataDir = (this.spawnOptions.get('datadir')) ? this.spawnOptions.get('datadir') : '';
+                let command = (dataDir) ? `--datadir="${dataDir}"` : '';
+                command += (this.isLight) ? ` --syncmode="light"` : '';
                 command += ` init "${genesisPath}"`;
                 exec(`"${binPath}" ${command}`, (error, stdout) => {
                     cb(error, stdout);

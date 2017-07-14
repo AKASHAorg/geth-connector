@@ -77,7 +77,7 @@ describe('GethConnector', function () {
         GethConnector.getInstance().once(events.FAILED, function (reason: string) {
             throw new Error(`could not start geth #FAILED ${reason}`);
         });
-        GethConnector.getInstance().start({cpu: events.PriorityCode.NORMAL});
+        GethConnector.getInstance().start({ cpu: events.PriorityCode.NORMAL });
         expect(GethConnector.getInstance().getCpuPriority()).to.equal(events.PriorityCode.NORMAL);
         sinon.assert.calledOnce(spy);
     });
@@ -197,15 +197,15 @@ describe('GethConnector', function () {
 
     it('should start and stop multiple times', function (done) {
         let called = 0;
-        const interval = setInterval(()=> {
-            GethConnector.getInstance().stop().delay(500).then(()=> {
+        const interval = setInterval(() => {
+            GethConnector.getInstance().stop().delay(500).then(() => {
                 GethConnector.getInstance().start();
-            })
+            });
         }, 4500);
         GethConnector.getInstance().on(events.IPC_CONNECTED, () => {
             called++;
         });
-        setTimeout(()=> {
+        setTimeout(() => {
             clearInterval(interval);
             expect(called).to.be.above(0);
             done();
@@ -220,7 +220,7 @@ describe('GethConnector', function () {
     });
 
     it('should remove executable', function () {
-        return GethConnector.getInstance().downloadManager.deleteBin()
+        return GethConnector.getInstance().downloadManager.deleteBin();
     });
 
     after(function (done) {
