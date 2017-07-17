@@ -35,12 +35,12 @@
     "@types/chai": "4.0.1",
     "@types/debug": "0.0.29",
     "@types/mocha": "2.2.41",
-    "@types/node": "8.0.12",
+    "@types/node": "^8.0.13",
     "@types/rimraf": "0.0.28",
     "@types/sinon": "2.3.2",
     "bin-wrapper": "3.0.2",
     "bluebird": "3.5.0",
-    "web3": "0.19.1"
+    "web3": "^0.20.1"
   },
   "devDependencies": {
     "chai": "4.1.0",
