@@ -7,5 +7,5 @@ export declare class GethBin {
     static requiredVersion(): string;
     getPath(): any;
     check(cb: any): void;
-    deleteBin(): Promise<{}>;
+    deleteBin(): Promise<any>;
 }
