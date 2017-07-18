@@ -41,6 +41,7 @@ export default class GethConnector extends EventEmitter {
 
     private cpuPriority = event.PriorityCode.LOW;
     public watchers = new Map();
+    private _downloadEventsEnabled = false;
 
     /**
      * @param enforcer
@@ -76,6 +77,7 @@ export default class GethConnector extends EventEmitter {
      */
     public setBinPath(path: string): void {
         this.downloadManager = new GethBin(path);
+        this._downloadEventsEnabled = false;
     }
 
     /**
@@ -229,6 +231,24 @@ export default class GethConnector extends EventEmitter {
         return true;
     }
 
+    public enableDownloadEvents() {
+        if (this._downloadEventsEnabled) {
+            return;
+        }
+        this.downloadManager.wrapper.downloadProgress.on(event.DOWNLOAD_STARTED, () => {
+            this.emit(event.DOWNLOAD_STARTED);
+        });
+
+        this.downloadManager.wrapper.downloadProgress.on(event.DOWNLOAD_PROGRESS, (progress) => {
+            this.emit(event.DOWNLOAD_PROGRESS, progress);
+        });
+
+        this.downloadManager.wrapper.downloadProgress.on(event.DOWNLOAD_ERROR, (error) => {
+            this.emit(event.DOWNLOAD_ERROR, error);
+        });
+        this._downloadEventsEnabled = true;
+    }
+
     /**
      * Set geth spawn options
      * Requires `this.restart()` when geth is already running
@@ -364,7 +384,7 @@ export default class GethConnector extends EventEmitter {
     private _checkBin() {
         return new Promise((resolve, reject) => {
             this.downloadManager.check(
-                (err: Error, data: { binPath?: string, downloading?: boolean }) => {
+                (err: Error, data: { binPath?: string }) => {
                     if (err) {
                         this.logger.error(err);
                         /**
@@ -377,13 +397,6 @@ export default class GethConnector extends EventEmitter {
 
                     if (data.binPath) {
                         return resolve(data.binPath);
-                    }
-
-                    if (data.downloading) {
-                        /**
-                         * @event GethConnector#DOWNLOADING_BINARY
-                         */
-                        this.emit(event.DOWNLOADING_BINARY);
                     }
                 });
         });

@@ -44,13 +44,14 @@ describe('GethConnector', function () {
 
     it('should write genesis block', function (done) {
         let downloaded = false;
-        GethConnector.getInstance().once(events.DOWNLOADING_BINARY, () => {
+        GethConnector.getInstance().once(events.DOWNLOAD_STARTED, () => {
             downloaded = true;
         });
         GethConnector.getInstance().once(events.BINARY_CORRUPTED, function () {
             // explicit fail
             throw new Error('There was a problem with geth binary');
         });
+        GethConnector.getInstance().enableDownloadEvents();
         GethConnector.getInstance().setOptions({ datadir: pathJoin(__dirname, 'testBin', 'chain') });
         GethConnector.getInstance().writeGenesis(
             pathJoin(__dirname, 'genesis.json'),

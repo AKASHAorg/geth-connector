@@ -1,7 +1,9 @@
+import { events } from '@akashaproject/bin-wrapper-progress';
+
+export const { DOWNLOAD_STARTED, DOWNLOAD_ERROR, DOWNLOAD_PROGRESS } = events;
 export const STARTING = 'GETH_STARTING';
 export const STARTED = 'GETH_STARTED';
 export const FAILED = 'GETH_START_FAILED';
-export const DOWNLOADING_BINARY = 'GETH_DOWNLOADING_BINARY';
 export const BINARY_CORRUPTED = 'GETH_BINARY_CORRUPTED';
 export const STOPPING = 'GETH_STOPPING';
 export const STOPPED = 'GETH_STOPPED';

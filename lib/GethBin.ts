@@ -1,5 +1,5 @@
 /// <reference path="../typings/main.d.ts"/>
-import Wrapper = require('bin-wrapper');
+import Wrapper from '@akashaproject/bin-wrapper-progress';
 import * as path from 'path';
 import * as Promise from 'bluebird';
 import { unlink } from 'fs';
@@ -54,23 +54,12 @@ export class GethBin {
      * @param cb
      */
     check(cb: any) {
-        let downloading = false;
-        const timeOut = setTimeout(() => {
-            downloading = true;
-            cb('', { downloading });
-        }, 2000);
         this.wrapper.run(['version'], (err: any) => {
-            clearTimeout(timeOut);
             if (err) {
                 return cb(err);
             }
             const response = { binPath: this.getPath() };
-
-            if (!downloading) {
-                return cb('', response);
-            }
-
-            setTimeout(() => cb('', response), 300);
+            cb('', response);
         });
     }
 
