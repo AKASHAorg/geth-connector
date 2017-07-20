@@ -31,14 +31,14 @@
   },
   "homepage": "https://github.com/AkashaProject/geth-connector#readme",
   "dependencies": {
-    "@akashaproject/bin-wrapper-progress": "1.0.2",
+    "@akashaproject/bin-wrapper-progress": "1.0.3",
     "@types/bluebird": "3.5.8",
     "@types/chai": "4.0.1",
     "@types/debug": "0.0.29",
     "@types/mocha": "2.2.41",
     "@types/node": "^8.0.13",
     "@types/rimraf": "0.0.28",
-    "@types/sinon": "2.3.2",
+    "@types/sinon": "2.3.3",
     "bluebird": "3.5.0",
     "web3": "0.20.1"
   },
@@ -53,7 +53,7 @@
     "sinon": "2.3.8",
     "standard-version": "4.2.0",
     "tslint": "5.5.0",
-    "typescript": "2.4.1"
+    "typescript": "2.4.2"
   },
   "directories": {
     "test": "tests"
