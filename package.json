@@ -1,6 +1,6 @@
 {
   "name": "@akashaproject/geth-connector",
-  "version": "1.7.20",
+  "version": "1.7.21",
   "description": "Package used by AKASHA to manage geth/web3",
   "main": "index.js",
   "types": "index.d.ts",
