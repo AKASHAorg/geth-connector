@@ -110,7 +110,6 @@ export default class GethConnector extends EventEmitter {
         }).then((passed: boolean) => {
             if (passed) {
                 this._attachEvents();
-                this.executeCpuPriority();
             }
             return passed;
         });
