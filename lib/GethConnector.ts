@@ -505,6 +505,7 @@ export default class GethConnector extends EventEmitter {
             }
             if (log.includes('Fatal') ||
                 log.includes('Synchronisation failed')) {
+                this.logger.error(`geth:sync:error: ${log}`);
                 /**
                  * @event GethConnector#FATAL
                  */
@@ -534,7 +535,7 @@ export default class GethConnector extends EventEmitter {
         this.removeListener(event.FATAL, this.socket.end);
 
         this.once(event.STARTED, this._tailGethLog);
-        this.once(event.FATAL, this.socket.end);
+        this.once(event.FATAL, () => this.socket ? this.socket.end : null);
     }
 
     /**
