@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="1.7.34"></a>
+## [1.7.34](https://github.com/AkashaProject/geth-connector/compare/v1.7.33...v1.7.34) (2018-04-17)
+
+
+
 <a name="1.7.33"></a>
 ## [1.7.33](https://github.com/AkashaProject/geth-connector/compare/v1.7.32...v1.7.33) (2018-03-27)
 
