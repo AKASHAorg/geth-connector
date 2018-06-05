@@ -1,4 +1,3 @@
-///<reference path="../node_modules/@types/node/index.d.ts"/>
 import GethConnector from './GethConnector';
 import * as Promise from 'bluebird';
 import {TX_MINED} from './Constants';

@@ -1,4 +1,3 @@
-/// <reference path="../node_modules/@types/node/index.d.ts" />
 import * as Promise from 'bluebird';
 export declare class GethHelper {
     watcher: any;
