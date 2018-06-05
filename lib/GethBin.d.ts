@@ -1,5 +1,4 @@
 /// <reference path="../typings/main.d.ts" />
-/// <reference types="bluebird" />
 import * as Promise from 'bluebird';
 export declare class GethBin {
     wrapper: any;

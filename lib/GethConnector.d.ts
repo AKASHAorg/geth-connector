@@ -1,5 +1,4 @@
 /// <reference types="node" />
-/// <reference types="bluebird" />
 import { GethBin } from './GethBin';
 import { Web3 } from './Web3';
 import * as event from './Constants';
@@ -33,7 +32,7 @@ export default class GethConnector extends EventEmitter {
     setCpuPriority(level: event.PriorityCode, immediate?: boolean): void;
     executeCpuPriority(): void;
     getCpuPriority(): event.PriorityCode;
-    private _flushEvents();
+    private _flushEvents;
     enableDownloadEvents(): void;
     setOptions(options?: any): Map<any, any>;
     restart(waitTime?: number): Promise<boolean>;
@@ -41,13 +40,13 @@ export default class GethConnector extends EventEmitter {
     static getDefaultDatadir(): string;
     static getDefaultIpcPath(): string;
     readonly web3: any;
-    private _checkBin();
-    private _flattenOptions();
-    private _attachEvents();
-    private __listenProcess();
-    private _tailGethLog();
-    private _watchGethStd();
-    private _attachListeners();
-    private _connectToIPC();
-    private _checkRunningSevice();
+    private _checkBin;
+    private _flattenOptions;
+    private _attachEvents;
+    private __listenProcess;
+    private _tailGethLog;
+    private _watchGethStd;
+    private _attachListeners;
+    private _connectToIPC;
+    private _checkRunningSevice;
 }

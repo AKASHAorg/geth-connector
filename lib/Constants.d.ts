@@ -22,5 +22,5 @@ export declare const INFO_FILTER = "INFO_FILTER";
 export declare enum PriorityCode {
     LOW = 1,
     NORMAL = 2,
-    HIGH = 3,
+    HIGH = 3
 }
