@@ -8,8 +8,8 @@ import { unlink } from 'fs';
 const defaultTarget = path.join(__dirname, 'bin');
 
 const repo = 'https://gethstore.blob.core.windows.net/builds/';
-const gethVersion = '1.8.13';
-const gethCommit = '225171a4';
+const gethVersion = '1.8.14';
+const gethCommit = '316fc7ec';
 // const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
