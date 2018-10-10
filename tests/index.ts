@@ -19,6 +19,8 @@ describe('GethConnector', function () {
             error: function () {
             },
             warn: function () {
+            },
+            debug: function () {
             }
         });
         rimraf(binPath, function () {

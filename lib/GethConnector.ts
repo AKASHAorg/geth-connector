@@ -9,8 +9,8 @@ import { homedir, type as osType } from 'os';
 import { join as pathJoin } from 'path';
 
 const platform = osType();
-const symbolEnforcer = Symbol();
-const symbol = Symbol();
+const symbolEnforcer = Symbol('go-ethereum');
+const symbol = Symbol('go-ethereum');
 
 const cpuPriority = {
   unix: {
@@ -181,8 +181,8 @@ export default class GethConnector extends EventEmitter {
         this.logger.error(`cpu:geth:exec error: ${error}`);
         return;
       }
-      this.logger.info(`cpu:geth:stdout: ${stdout}`);
-      this.logger.info(`cpu:geth:stderr: ${stderr}`);
+      this.logger.debug(`cpu:geth:stdout: ${stdout}`);
+      this.logger.debug(`cpu:geth:stderr: ${stderr}`);
     });
   }
 
@@ -437,14 +437,14 @@ export default class GethConnector extends EventEmitter {
         this.emit(event.ERROR, message);
       } else {
         message = `geth: received signal: ${signal}`;
-        this.logger.info(message);
+        this.logger.debug(message);
       }
       this._flushEvents();
       this.serviceStatus.process = false;
     });
 
     this.gethService.once('close', (code: number, signal: string) => {
-      this.logger.info('geth:spawn:close:', code, signal);
+      this.logger.debug('geth:spawn:close:', code, signal);
       /**
        * @event GethConnector#STOPPED
        */
@@ -471,7 +471,7 @@ export default class GethConnector extends EventEmitter {
       this.watchers.delete(event.START_FILTER);
     }
     const infoFilter = (data: Buffer) => {
-      this.logger.info(data.toString());
+      this.logger.debug(data.toString());
     };
     this.watchers.set(event.INFO_FILTER, infoFilter);
     this.gethService.stdout.on('data', this.watchers.get(event.INFO_FILTER));
@@ -517,7 +517,7 @@ export default class GethConnector extends EventEmitter {
         clearTimeout(timeout);
         this._connectToIPC();
       }
-      this.logger.info(log);
+      this.logger.debug(log);
     };
     // save a reference for removeListener
     this.watchers.set(event.START_FILTER, startFilter);
@@ -546,7 +546,7 @@ export default class GethConnector extends EventEmitter {
   private _connectToIPC() {
     this.ipcStream.setProvider(this.spawnOptions.get('ipcpath'), this.socket);
     this.socket.once('connect', () => {
-      this.logger.info('connection to ipc Established!');
+      this.logger.info('Connection to go-ethereum ipc established!');
       /**
        * @event GethConnector#IPC_CONNECTED
        */
