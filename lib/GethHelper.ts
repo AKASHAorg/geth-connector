@@ -30,16 +30,16 @@ export class GethHelper {
 
       if (!data[0] && data[1] > 0) {
         return GethConnector.getInstance()
-        .web3
-        .eth
-        .getBlockAsync('latest')
-        .then((latestBlock: any): any => {
-          if ((latestBlock.timestamp + 60 * 2) > timeStamp) {
-            this.syncing = false;
-            return [];
-          }
-          return [data[1]];
-        });
+          .web3
+          .eth
+          .getBlockAsync('latest')
+          .then((latestBlock: any): any => {
+            if ((latestBlock.timestamp + 60 * 2) > timeStamp) {
+              this.syncing = false;
+              return [];
+            }
+            return [data[1]];
+          });
       }
 
       return [data[1]];
@@ -103,12 +103,12 @@ export class GethHelper {
    */
   public hasKey(address: string) {
     return GethConnector.getInstance()
-    .web3
-    .eth
-    .getAccountsAsync()
-    .then((list: string[]) => {
-      return list.indexOf(address) !== -1;
-    });
+      .web3
+      .eth
+      .getAccountsAsync()
+      .then((list: string[]) => {
+        return list.indexOf(address) !== -1;
+      });
   }
 
   /**

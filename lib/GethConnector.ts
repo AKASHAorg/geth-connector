@@ -36,11 +36,10 @@ export default class GethConnector extends EventEmitter {
     api: false,
     version: '',
   };
+  public watchers = new Map();
   private socket: Socket;
   private connectedToLocal: boolean = false;
-
   private cpuPriority = event.PriorityCode.LOW;
-  public watchers = new Map();
   private _downloadEventsEnabled = false;
 
   /**
@@ -54,6 +53,14 @@ export default class GethConnector extends EventEmitter {
   }
 
   /**
+   * Access web3 object
+   * @returns {Web3Factory}
+   */
+  get web3() {
+    return this.ipcStream.web3;
+  }
+
+  /**
    * @returns {GethConnector}
    */
   public static getInstance(): GethConnector {
@@ -61,6 +68,46 @@ export default class GethConnector extends EventEmitter {
       this[symbol] = new GethConnector(symbolEnforcer);
     }
     return this[symbol];
+  }
+
+  /**
+   * Get geth default datadir path
+   * @returns {string}
+   */
+  static getDefaultDatadir() {
+    let dataDir: string;
+    switch (platform) {
+      case 'Linux':
+        dataDir = pathJoin(homedir(), '.ethereum');
+        break;
+      case 'Darwin':
+        dataDir = pathJoin(homedir(), 'Library', 'Ethereum');
+        break;
+      case 'Windows_NT':
+        dataDir = pathJoin(process.env.APPDATA, '/Ethereum');
+        break;
+      default:
+        throw new Error('Platform not supported');
+    }
+    return dataDir;
+  }
+
+  /**
+   * Path for web3 ipc provider
+   * @returns {string}
+   */
+  static getDefaultIpcPath() {
+    const dataDirPath = GethConnector.getDefaultDatadir();
+    let ipcPath: string;
+    switch (platform) {
+      case 'Windows_NT':
+        ipcPath = '\\\\.\\pipe\\geth.ipc';
+        break;
+      default:
+        ipcPath = pathJoin(dataDirPath, 'geth.ipc');
+        break;
+    }
+    return ipcPath;
   }
 
   /**
@@ -147,7 +194,6 @@ export default class GethConnector extends EventEmitter {
     });
   }
 
-
   /**
    * connect to existing geth ipc
    */
@@ -188,46 +234,6 @@ export default class GethConnector extends EventEmitter {
 
   public getCpuPriority() {
     return this.cpuPriority;
-  }
-
-  /**
-   * Remove web3 and logging listeners
-   * @private
-   */
-  private _flushEvents() {
-    this.web3.reset();
-    this.serviceStatus.api = false;
-    this.serviceStatus.process = false;
-    this.serviceStatus.version = '';
-    if (this.socket) {
-      this.socket.removeAllListeners();
-    }
-    if (!this.connectedToLocal) {
-      if (this.watchers.get(event.START_FILTER)) {
-        this.gethService
-        .stderr
-        .removeListener('data', this.watchers.get(event.START_FILTER));
-        this.watchers
-        .delete(event.START_FILTER);
-      }
-      if (this.watchers.get(event.INFO_FILTER)) {
-        this.gethService
-        .stdout
-        .removeListener('data', this.watchers.get(event.INFO_FILTER));
-
-        this.gethService
-        .stderr
-        .removeListener('data', this.watchers.get(event.INFO_FILTER));
-
-        this.watchers
-        .delete(event.INFO_FILTER);
-      }
-    }
-    if (this.socket) {
-      this.socket.end();
-    }
-    this.socket = null;
-    return true;
   }
 
   public enableDownloadEvents() {
@@ -303,9 +309,9 @@ export default class GethConnector extends EventEmitter {
    */
   public restart(waitTime = 5000) {
     return Promise
-    .resolve(this.stop())
-    .delay(waitTime)
-    .then(() => this.start());
+      .resolve(this.stop())
+      .delay(waitTime)
+      .then(() => this.start());
   }
 
   /**
@@ -327,51 +333,43 @@ export default class GethConnector extends EventEmitter {
   }
 
   /**
-   * Get geth default datadir path
-   * @returns {string}
+   * Remove web3 and logging listeners
+   * @private
    */
-  static getDefaultDatadir() {
-    let dataDir: string;
-    switch (platform) {
-      case 'Linux':
-        dataDir = pathJoin(homedir(), '.ethereum');
-        break;
-      case 'Darwin':
-        dataDir = pathJoin(homedir(), 'Library', 'Ethereum');
-        break;
-      case 'Windows_NT':
-        dataDir = pathJoin(process.env.APPDATA, '/Ethereum');
-        break;
-      default:
-        throw new Error('Platform not supported');
+  private _flushEvents() {
+    this.web3.reset();
+    this.serviceStatus.api = false;
+    this.serviceStatus.process = false;
+    this.serviceStatus.version = '';
+    if (this.socket) {
+      this.socket.removeAllListeners();
     }
-    return dataDir;
-  }
+    if (!this.connectedToLocal) {
+      if (this.watchers.get(event.START_FILTER)) {
+        this.gethService
+          .stderr
+          .removeListener('data', this.watchers.get(event.START_FILTER));
+        this.watchers
+          .delete(event.START_FILTER);
+      }
+      if (this.watchers.get(event.INFO_FILTER)) {
+        this.gethService
+          .stdout
+          .removeListener('data', this.watchers.get(event.INFO_FILTER));
 
-  /**
-   * Path for web3 ipc provider
-   * @returns {string}
-   */
-  static getDefaultIpcPath() {
-    const dataDirPath = GethConnector.getDefaultDatadir();
-    let ipcPath: string;
-    switch (platform) {
-      case 'Windows_NT':
-        ipcPath = '\\\\.\\pipe\\geth.ipc';
-        break;
-      default:
-        ipcPath = pathJoin(dataDirPath, 'geth.ipc');
-        break;
+        this.gethService
+          .stderr
+          .removeListener('data', this.watchers.get(event.INFO_FILTER));
+
+        this.watchers
+          .delete(event.INFO_FILTER);
+      }
     }
-    return ipcPath;
-  }
-
-  /**
-   * Access web3 object
-   * @returns {Web3Factory}
-   */
-  get web3() {
-    return this.ipcStream.web3;
+    if (this.socket) {
+      this.socket.end();
+    }
+    this.socket = null;
+    return true;
   }
 
   /**
@@ -598,9 +596,9 @@ export default class GethConnector extends EventEmitter {
         this.logger.warn(message);
         this.emit(event.UPDATING_BINARY, message);
         return this.stop()
-        .delay(5000)
-        .then(() => this.downloadManager.deleteBin())
-        .then(() => this.start());
+          .delay(5000)
+          .then(() => this.downloadManager.deleteBin())
+          .then(() => this.start());
       }
       let netId = this.spawnOptions.get('networkid');
       if (this.spawnOptions.has('testnet')) {

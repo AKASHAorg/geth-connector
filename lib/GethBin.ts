@@ -8,8 +8,8 @@ import { unlink } from 'fs';
 const defaultTarget = path.join(__dirname, 'bin');
 
 const repo = 'https://gethstore.blob.core.windows.net/builds/';
-const gethVersion = '1.8.17';
-const gethCommit = '8bbe7207';
+const gethVersion = '1.8.18';
+const gethCommit = '58632d44';
 // const baseUrl = url.resolve(repo, gethVersion);
 
 const source = {
@@ -26,11 +26,11 @@ export class GethBin {
    */
   constructor(target: string = defaultTarget) {
     this.wrapper = new Wrapper()
-    .src(source.linux, 'linux', 'x64')
-    .src(source.win, 'win32', 'x64')
-    .src(source.osx, 'darwin', 'x64')
-    .dest(target)
-    .use(process.platform === 'win32' ? 'geth.exe' : 'geth');
+      .src(source.linux, 'linux', 'x64')
+      .src(source.win, 'win32', 'x64')
+      .src(source.osx, 'darwin', 'x64')
+      .dest(target)
+      .use(process.platform === 'win32' ? 'geth.exe' : 'geth');
   }
 
   /**
